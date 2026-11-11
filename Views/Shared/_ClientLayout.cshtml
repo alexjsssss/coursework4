@@ -1,0 +1,416 @@
+﻿
+@{
+    var currentAction =
+        ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    var name = User.Identity?.Name ?? "Клієнт";
+
+    var initials = string.Concat(
+        name.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(part => char.ToUpperInvariant(part[0]))
+    );
+
+    if (string.IsNullOrWhiteSpace(initials))
+    {
+        initials = "К";
+    }
+}
+
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] — Чисто</title>
+
+    <!-- ШРИФТ -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet" />
+
+    <!-- СТИЛІ -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <!-- ЗАСТОСУВАННЯ ТЕМИ ДО ЗАВАНТАЖЕННЯ -->
+    <script>
+        (function () {
+
+            const savedTheme =
+                localStorage.getItem("carwash-theme");
+
+            document.documentElement.dataset.theme =
+                savedTheme === "dark" ? "dark" : "light";
+
+        })();
+    </script>
+
+</head>
+
+<body class="client-layout">
+
+    <!-- ======================================
+         БІЧНА ПАНЕЛЬ
+    ======================================= -->
+
+    <aside class="sidebar">
+
+        <!-- ЛОГОТИП -->
+        <a asp-controller="Client"
+           asp-action="Index"
+           class="brand"
+           aria-label="Чисто — головна сторінка">
+
+            <span class="brand-icon"
+                  aria-hidden="true">
+
+                <svg viewBox="0 0 32 40">
+
+                    <path class="brand-drop"
+                          d="M16 2C12 9 4 18 4 25a12 12 0 0 0 24 0C28 18 20 9 16 2Z" />
+
+                    <path class="brand-drop-detail"
+                          d="M11 27c0 3 2 5 5 5"
+                          fill="none"
+                          stroke-width="2.5"
+                          stroke-linecap="round" />
+
+                </svg>
+
+            </span>
+
+            <span class="brand-name">
+                Чисто
+            </span>
+
+        </a>
+
+        <!-- ======================================
+             НАВІГАЦІЯ
+        ======================================= -->
+
+        <nav class="sidebar-nav"
+             aria-label="Меню клієнта">
+
+            <!-- ГОЛОВНА -->
+            <a asp-controller="Client"
+               asp-action="Index"
+               class="sidebar-link @(currentAction == "Index" ? "active" : "")"
+               aria-current="@(currentAction == "Index" ? "page" : null)">
+
+                <svg viewBox="0 0 24 24"
+                     aria-hidden="true">
+
+                    <rect x="3"
+                          y="3"
+                          width="7"
+                          height="7"
+                          rx="1.5" />
+
+                    <rect x="14"
+                          y="3"
+                          width="7"
+                          height="7"
+                          rx="1.5" />
+
+                    <rect x="3"
+                          y="14"
+                          width="7"
+                          height="7"
+                          rx="1.5" />
+
+                    <rect x="14"
+                          y="14"
+                          width="7"
+                          height="7"
+                          rx="1.5" />
+
+                </svg>
+
+                <span>Головна</span>
+
+            </a>
+
+            <!-- ПОСЛУГИ -->
+            <a asp-controller="Client"
+               asp-action="Services"
+               class="sidebar-link @(currentAction == "Services" ? "active" : "")"
+               aria-current="@(currentAction == "Services" ? "page" : null)">
+
+                <svg viewBox="0 0 24 24"
+                     aria-hidden="true">
+
+                    <path d="M12 3c-2.5 3.5-6 7.5-6 11a6 6 0 0 0 12 0c0-3.5-3.5-7.5-6-11Z" />
+
+                    <path d="M9 15a3 3 0 0 0 3 3" />
+
+                </svg>
+
+                <span>Послуги</span>
+
+            </a>
+
+            <!-- ІСТОРІЯ ЗАМОВЛЕНЬ -->
+            <a asp-controller="Client"
+               asp-action="History"
+               class="sidebar-link @(currentAction == "History" ? "active" : "")"
+               aria-current="@(currentAction == "History" ? "page" : null)">
+
+                <svg viewBox="0 0 24 24"
+                     aria-hidden="true">
+
+                    <path d="M3 12a9 9 0 1 0 3-6.7" />
+
+                    <path d="M3 4v5h5" />
+
+                    <path d="M12 7v5l3 2" />
+
+                </svg>
+
+                <span>Історія замовлень</span>
+
+            </a>
+
+            <!-- МІЙ ПРОФІЛЬ -->
+            <a asp-controller="Client"
+               asp-action="Profile"
+               class="sidebar-link @(currentAction == "Profile" ? "active" : "")"
+               aria-current="@(currentAction == "Profile" ? "page" : null)">
+
+                <svg viewBox="0 0 24 24"
+                     aria-hidden="true">
+
+                    <circle cx="12"
+                            cy="8"
+                            r="4" />
+
+                    <path d="M4 21a8 8 0 0 1 16 0" />
+
+                </svg>
+
+                <span>Мій профіль</span>
+
+            </a>
+
+        </nav>
+
+        <!-- ======================================
+             ВИХІД З АКАУНТА
+        ======================================= -->
+
+        <div class="sidebar-bottom">
+
+            <form asp-controller="Account"
+                  asp-action="Logout"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="logout-button">
+
+                    <svg viewBox="0 0 24 24"
+                         aria-hidden="true">
+
+                        <path d="M10 17l5-5-5-5" />
+
+                        <path d="M15 12H3" />
+
+                        <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7" />
+
+                    </svg>
+
+                    <span>Вийти</span>
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+    <!-- ======================================
+         ОСНОВНА ОБЛАСТЬ
+    ======================================= -->
+
+    <div class="main-area">
+
+        <!-- ВЕРХНЯ ПАНЕЛЬ -->
+        <header class="topbar">
+
+            <div class="topbar-actions">
+
+                <!-- ПЕРЕМИКАЧ ТЕМИ -->
+                <button type="button"
+                        class="theme-button"
+                        id="themeToggle"
+                        aria-label="Змінити тему">
+
+                    <!-- СВІТЛА ТЕМА -->
+                    <span class="theme-option"
+                          data-mode="light">
+
+                        <svg viewBox="0 0 24 24"
+                             aria-hidden="true">
+
+                            <circle cx="12"
+                                    cy="12"
+                                    r="4" />
+
+                            <path d="M12 2v2
+                                     M12 20v2
+                                     M2 12h2
+                                     M20 12h2
+                                     M4.9 4.9l1.5 1.5
+                                     M17.6 17.6l1.5 1.5
+                                     M4.9 19.1l1.5-1.5
+                                     M17.6 6.4l1.5-1.5" />
+
+                        </svg>
+
+                    </span>
+
+                    <!-- ТЕМНА ТЕМА -->
+                    <span class="theme-option"
+                          data-mode="dark">
+
+                        <svg viewBox="0 0 24 24"
+                             aria-hidden="true">
+
+                            <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4
+                                     8.5 8.5 0 1 0 20 15.2Z" />
+
+                        </svg>
+
+                    </span>
+
+                </button>
+
+                <!-- ІНФОРМАЦІЯ ПРО КЛІЄНТА -->
+                <div class="account-info">
+
+                    <div class="account-avatar"
+                         aria-hidden="true">
+                        @initials
+                    </div>
+
+                    <div class="account-details">
+
+                        <strong>@name</strong>
+
+                        <small>Клієнт</small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- ВМІСТ ПОТОЧНОЇ СТОРІНКИ -->
+        <main class="page-content"
+              role="main">
+
+            @RenderBody()
+
+        </main>
+
+    </div>
+
+    <!-- ======================================
+         СКРИПТИ
+    ======================================= -->
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ПЕРЕМИКАННЯ ТЕМИ -->
+    <script>
+        (function () {
+
+            const themeToggle =
+                document.getElementById("themeToggle");
+
+            if (!themeToggle) {
+                return;
+            }
+
+            function applyTheme(theme) {
+
+                const selectedTheme =
+                    theme === "dark" ? "dark" : "light";
+
+                // Змінюємо тему сторінки
+                document.documentElement.dataset.theme =
+                    selectedTheme;
+
+                // Запам'ятовуємо вибір
+                localStorage.setItem(
+                    "carwash-theme",
+                    selectedTheme
+                );
+
+                // Доступність
+                themeToggle.setAttribute(
+                    "aria-label",
+                    selectedTheme === "dark"
+                        ? "Увімкнути світлу тему"
+                        : "Увімкнути темну тему"
+                );
+
+                // Оновлюємо стан кнопки
+                themeToggle.setAttribute(
+                    "aria-pressed",
+                    selectedTheme === "dark"
+                        ? "true"
+                        : "false"
+                );
+
+            }
+
+            // Початкова тема
+            applyTheme(
+                document.documentElement.dataset.theme
+            );
+
+            // Натискання кнопки
+            themeToggle.addEventListener(
+                "click",
+                function () {
+
+                    const currentTheme =
+                        document.documentElement.dataset.theme;
+
+                    const nextTheme =
+                        currentTheme === "dark"
+                            ? "light"
+                            : "dark";
+
+                    applyTheme(nextTheme);
+
+                }
+            );
+
+        })();
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

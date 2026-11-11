@@ -1,0 +1,265 @@
+﻿
+@model CarWashSystem.ViewModels.ClientDashboardViewModel
+
+@{
+    ViewData["Title"] = "Головна";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+
+    var kyivTimeZone =
+        TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv");
+
+    var bays = Model.WashingBays
+        .OrderBy(b =>
+            int.TryParse(
+                new string(b.Name.Where(char.IsDigit).ToArray()),
+                out var number
+            ) ? number : int.MaxValue)
+        .Take(6)
+        .ToList();
+
+    var availableCount = bays.Count(b =>
+        b.Status?.ToLowerInvariant() == "available");
+
+    var recentOrders = Model.RecentOrders
+        .OrderByDescending(o => o.CreatedAt)
+        .Take(5)
+        .ToList();
+}
+
+<div class="dashboard-page">
+
+    <header class="dashboard-header">
+        <h1>Головна</h1>
+
+        <a asp-controller="Client"
+           asp-action="Services"
+           class="dashboard-order-button">
+            <span>+</span>
+            Замовити миття
+        </a>
+    </header>
+
+    <div class="dashboard-main-grid">
+
+        <!-- МИЙНІ БОКСИ -->
+        <section class="dashboard-section dashboard-bays-panel">
+
+            <div class="section-heading">
+                <h2>Мийні бокси</h2>
+
+                <span class="available-label">
+                    Вільно: @availableCount
+                </span>
+            </div>
+
+            <div class="dashboard-bays-grid">
+
+                @foreach (var bay in bays)
+                {
+                    var status =
+                        bay.Status?.ToLowerInvariant() ?? "";
+
+                    var statusText = status switch
+                    {
+                        "available" => "Вільний",
+                        "occupied" => "Зайнятий",
+                        _ => "Не працює"
+                    };
+
+                    var statusClass = status switch
+                    {
+                        "available" => "bay-available",
+                        "occupied" => "bay-occupied",
+                        _ => "bay-unavailable"
+                    };
+
+                    var bayNumber = new string(
+                        bay.Name.Where(char.IsDigit).ToArray()
+                    );
+
+                    var displayName = string.IsNullOrEmpty(bayNumber)
+                        ? bay.Name
+                        : $"Бокс №{bayNumber}";
+
+                        <div class="bay-card">
+
+                            <!-- ДВОКОЛІРНА МАШИНКА -->
+                            <span class="dashboard-car-icon"
+                                  aria-hidden="true">
+
+                                <svg viewBox="0 0 48 48">
+
+                                    <!-- КУЗОВ -->
+                                    <path class="car-body-fill"
+                                          d="M7 22L12 13C13 11 15 10 18 10H30C33 10 35 11 36 13L41 22V34H7V22Z" />
+
+                                    <!-- СКЛО -->
+                                    <path class="car-window-fill"
+                                          d="M15 15H33L37 23H11L15 15Z" />
+
+                                    <!-- ФАРИ -->
+                                    <rect class="car-window-fill"
+                                          x="10"
+                                          y="27"
+                                          width="7"
+                                          height="3"
+                                          rx="1.5" />
+
+                                    <rect class="car-window-fill"
+                                          x="31"
+                                          y="27"
+                                          width="7"
+                                          height="3"
+                                          rx="1.5" />
+
+                                    <!-- КОЛЕСА -->
+                                    <path class="car-body-fill"
+                                          d="M11 34H17V39H11Z M31 34H37V39H31Z" />
+
+                                </svg>
+
+                            </span>
+
+                            <div class="bay-info">
+                                <strong>@displayName</strong>
+
+                                <small class="@statusClass">
+                                    ● @statusText
+                                </small>
+                            </div>
+
+                        </div>
+                }
+
+            </div>
+
+        </section>
+
+        <!-- СТАТИСТИКА -->
+        <div class="dashboard-stats-column">
+
+            <section class="dashboard-stat-card">
+                <span class="dashboard-stat-label">
+                    Мої замовлення
+                </span>
+
+                <strong class="dashboard-stat-value">
+                    @Model.OrdersCount
+                </strong>
+            </section>
+
+            <section class="dashboard-stat-card">
+                <span class="dashboard-stat-label">
+                    Витрачено
+                </span>
+
+                <strong class="dashboard-stat-value">
+                    @Model.TotalSpent.ToString("N0") ₴
+                </strong>
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- ОСТАННІ ЗАМОВЛЕННЯ -->
+    <section class="dashboard-section dashboard-orders-section">
+
+        <div class="section-heading">
+            <h2>Останні замовлення</h2>
+
+            <a asp-controller="Client"
+               asp-action="History">
+                Уся історія →
+            </a>
+        </div>
+
+        @if (recentOrders.Any())
+        {
+                <div class="table-responsive">
+
+                    <table class="dashboard-orders-table">
+
+                        <thead>
+                            <tr>
+                                <th>Замовлення</th>
+                                <th>Дата</th>
+                                <th>Сума</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        @foreach (var order in recentOrders)
+                        {
+                            var kyivTime = order.CreatedAt.HasValue
+                                ? TimeZoneInfo.ConvertTimeFromUtc(
+                                    DateTime.SpecifyKind(
+                                        order.CreatedAt.Value,
+                                        DateTimeKind.Utc
+                                    ),
+                                    kyivTimeZone
+                                )
+                                : (DateTime?)null;
+
+                            var status =
+                                order.Status?.ToLowerInvariant() ?? "";
+
+                            var statusText = status switch
+                            {
+                                "pending" => "Очікує оплати",
+                                "paid" => "Оплачено",
+                                "in_progress" => "Миття триває",
+                                "completed" => "Завершено",
+                                "cancelled" => "Скасовано",
+                                _ => order.Status
+                            };
+
+                            var statusClass = status switch
+                            {
+                                "pending" => "status-pending",
+                                "paid" => "status-paid",
+                                "in_progress" => "status-paid",
+                                "completed" => "status-completed",
+                                "cancelled" => "status-cancelled",
+                                _ => "status-pending"
+                            };
+
+                                    <tr>
+                                        <td>
+                                            <strong>Ч-@order.Id</strong>
+                                        </td>
+
+                                        <td>
+                                    @(kyivTime?.ToString("dd.MM.yyyy HH:mm") ?? "—")
+                                        </td>
+
+                                        <td>
+                                    @order.TotalAmount.ToString("N0") ₴
+                                        </td>
+
+                                        <td>
+                                            <span class="order-status @statusClass">
+                                                ● @statusText
+                                            </span>
+                                        </td>
+                                    </tr>
+                        }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+        }
+        else
+        {
+                <div class="dashboard-empty">
+                    У вас поки немає замовлень.
+                </div>
+        }
+
+    </section>
+
+</div>

@@ -1,0 +1,159 @@
+﻿
+@model CarWashSystem.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Замовлення підтверджено";
+    Layout = "~/Views/Shared/_PaymentLayout.cshtml";
+
+    var bayName = (Model.WashingBayName ?? "")
+        .Replace("Пост", "Бокс")
+        .Replace("пост", "бокс");
+
+    var kyivTimeZone =
+        TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv");
+
+    DateTime? paymentTime = null;
+
+    if (Model.CreatedAt.HasValue)
+    {
+        var utcTime = DateTime.SpecifyKind(
+            Model.CreatedAt.Value,
+            DateTimeKind.Utc
+        );
+
+        paymentTime = TimeZoneInfo.ConvertTimeFromUtc(
+            utcTime,
+            kyivTimeZone
+        );
+    }
+}
+
+<section class="payment-confirmation-card">
+
+    <!-- ЗАГОЛОВОК -->
+    <div class="confirmation-heading">
+
+        <h1>Замовлення підтверджено</h1>
+
+    </div>
+
+    <!-- УСПІШНА ОПЛАТА -->
+    <div class="confirmation-success">
+
+        <div class="confirmation-check">
+
+            <svg viewBox="0 0 24 24"
+                 width="36"
+                 height="36"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2.5"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 aria-hidden="true">
+
+                <path d="M5 12l5 5L20 7" />
+
+            </svg>
+
+        </div>
+
+        <h2>Оплату успішно виконано!</h2>
+
+        <span class="confirmation-status">
+            Замовлення Ч-@Model.OrderId оплачено
+        </span>
+
+    </div>
+
+    <!-- ДЕТАЛІ ЗАМОВЛЕННЯ -->
+    <div class="confirmation-details">
+
+        <div class="confirmation-row">
+            <span>Номер замовлення</span>
+            <strong>Ч-@Model.OrderId</strong>
+        </div>
+
+        <div class="confirmation-row">
+            <span>Клієнт</span>
+            <strong>@Model.ClientName</strong>
+        </div>
+
+        <div class="confirmation-row">
+            <span>Мийний бокс</span>
+            <strong>@bayName</strong>
+        </div>
+
+        <div class="confirmation-row">
+            <span>Тривалість миття</span>
+            <strong>@Model.TotalDuration хв</strong>
+        </div>
+
+        @if (paymentTime.HasValue)
+        {
+                <div class="confirmation-row">
+
+                    <span>Дата та час оплати</span>
+
+                    <strong>
+                    @paymentTime.Value.ToString("dd.MM.yyyy HH:mm")
+                    </strong>
+
+                </div>
+        }
+
+        <div class="confirmation-divider"></div>
+
+        <h3>Оплачені послуги</h3>
+
+        @foreach (var service in Model.Services)
+        {
+                <div class="confirmation-row">
+
+                    <span>@service.Name</span>
+
+                    <strong>
+                    @service.Price.ToString("N0") ₴
+                    </strong>
+
+                </div>
+        }
+
+        <div class="confirmation-divider"></div>
+
+        <div class="confirmation-total">
+
+            <span>Сплачено</span>
+
+            <strong>
+                @Model.TotalAmount.ToString("N0") ₴
+            </strong>
+
+        </div>
+
+    </div>
+
+    <!-- ПОВЕРНЕННЯ -->
+    <a asp-controller="Client"
+       asp-action="Index"
+       class="confirmation-home-button">
+
+        Перейти на головну
+
+        <svg viewBox="0 0 24 24"
+             width="19"
+             height="19"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             stroke-linecap="round"
+             stroke-linejoin="round"
+             aria-hidden="true">
+
+            <path d="M5 12h14M13 6l6 6-6 6" />
+
+        </svg>
+
+    </a>
+
+</section>

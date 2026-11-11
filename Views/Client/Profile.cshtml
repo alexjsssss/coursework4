@@ -1,0 +1,562 @@
+﻿
+@model CarWashSystem.ViewModels.ClientProfileViewModel
+
+@{
+    ViewData["Title"] = "Мій профіль";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+
+    var initials = string.Concat(
+        Model.FullName
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(p => char.ToUpperInvariant(p[0]))
+    );
+
+    if (string.IsNullOrWhiteSpace(initials))
+    {
+        initials = "К";
+    }
+
+    var profileError = TempData["ProfileError"]?.ToString();
+    var passwordError = TempData["PasswordError"]?.ToString();
+    var success = TempData["ProfileSuccess"]?.ToString();
+}
+
+<div class="client-profile-page">
+
+    <header class="client-profile-page-header">
+        <h1>Мій профіль</h1>
+    </header>
+
+    <section class="client-profile-card">
+
+        <!-- ІНФОРМАЦІЯ ПРО КЛІЄНТА -->
+        <div class="client-profile-top">
+
+            <div class="client-profile-person">
+
+                <div class="client-profile-avatar"
+                     aria-hidden="true">
+                    @initials
+                </div>
+
+                <div class="client-profile-person-details">
+                    <h2>@Model.FullName</h2>
+                    <p>@Model.Email</p>
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="client-profile-edit-button"
+                    id="editProfileButton">
+
+                <svg viewBox="0 0 24 24"
+                     aria-hidden="true">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4Z" />
+                </svg>
+
+                Редагувати профіль
+            </button>
+
+        </div>
+
+        <!-- ПОВІДОМЛЕННЯ ПРО РЕЗУЛЬТАТ -->
+        @if (!string.IsNullOrWhiteSpace(success))
+        {
+                <div class="client-profile-message success"
+                     role="status">
+                @success
+                </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(profileError))
+        {
+                <div class="client-profile-message error"
+                     role="alert">
+                @profileError
+                </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(passwordError))
+        {
+                <div class="client-profile-message error"
+                     role="alert">
+                @passwordError
+                </div>
+        }
+
+        <!-- ФОРМА РЕДАГУВАННЯ -->
+        <form asp-controller="Client"
+              asp-action="UpdateProfile"
+              method="post"
+              id="profileForm">
+
+            @Html.AntiForgeryToken()
+
+            <div class="client-profile-fields">
+
+                <div class="client-profile-field">
+
+                    <label for="profileFullName">
+                        Ім'я
+                    </label>
+
+                    <input type="text"
+                           id="profileFullName"
+                           name="FullName"
+                           value="@Model.FullName"
+                           maxlength="100"
+                           required
+                           readonly />
+
+                </div>
+
+                <div class="client-profile-field">
+
+                    <label for="profilePhone">
+                        Телефон
+                    </label>
+
+                    <input type="tel"
+                           id="profilePhone"
+                           name="Phone"
+                           value="@Model.Phone"
+                           autocomplete="tel"
+                           readonly />
+
+                </div>
+
+                <div class="client-profile-field client-profile-full">
+
+                    <label for="profileEmail">
+                        Email
+                    </label>
+
+                    <input type="email"
+                           id="profileEmail"
+                           name="Email"
+                           value="@Model.Email"
+                           autocomplete="email"
+                           required
+                           readonly />
+
+                </div>
+
+            </div>
+
+            <!-- КНОПКИ РЕДАГУВАННЯ -->
+            <div class="client-profile-edit-actions"
+                 id="profileEditActions"
+                 hidden>
+
+                <button type="submit"
+                        class="client-profile-primary-button">
+                    Зберегти зміни
+                </button>
+
+                <button type="button"
+                        class="client-profile-secondary-button"
+                        id="cancelProfileEdit">
+                    Скасувати
+                </button>
+
+            </div>
+
+        </form>
+
+        <!-- РОЗДІЛ ПАРОЛЯ -->
+        <div class="client-profile-password-section">
+
+            <div class="client-profile-password-header">
+
+                <div class="client-profile-password-info">
+
+
+<div class="client-profile-lock-icon">
+    <svg viewBox="0 0 24 24"
+         width="20"
+         height="20"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="1.8"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true">
+
+        <rect x="5"
+              y="10"
+              width="14"
+              height="11"
+              rx="2"
+              fill="none" />
+
+        <path d="M8 10V7a4 4 0 0 1 8 0v3"
+              fill="none" />
+
+        <path d="M12 14v3"
+              fill="none" />
+    </svg>
+</div>
+
+
+                    <div>
+                        <strong>Пароль</strong>
+                        <span>••••••••</span>
+                    </div>
+
+                </div>
+
+                <button type="button"
+                        class="client-profile-secondary-button"
+                        id="togglePasswordButton">
+
+                    <span id="passwordToggleText">
+                        Змінити пароль
+                    </span>
+
+                </button>
+
+            </div>
+
+            <!-- ФОРМА ЗМІНИ ПАРОЛЯ -->
+            <form asp-controller="Client"
+                  asp-action="ChangePassword"
+                  method="post"
+                  id="changePasswordForm"
+                  class="client-profile-password-form"
+                  hidden>
+
+                @Html.AntiForgeryToken()
+
+                <div class="client-profile-password-grid">
+
+                    <!-- ПОТОЧНИЙ ПАРОЛЬ -->
+                    <div class="client-profile-field client-profile-full">
+
+                        <label for="currentPassword">
+                            Поточний пароль
+                        </label>
+
+                        <div class="client-profile-password-input">
+
+                            <input type="password"
+                                   id="currentPassword"
+                                   name="CurrentPassword"
+                                   autocomplete="current-password"
+                                   minlength="1"
+                                   required />
+
+                            <button type="button"
+                                    class="client-profile-eye-button"
+                                    data-target="currentPassword"
+                                    aria-label="Показати пароль"
+                                    aria-pressed="false">
+
+                                <svg viewBox="0 0 24 24"
+                                     aria-hidden="true">
+
+                                    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
+
+                                    <circle cx="12"
+                                            cy="12"
+                                            r="3" />
+
+                                    <path class="eye-slash"
+                                          d="M3 3l18 18" />
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- НОВИЙ ПАРОЛЬ -->
+                    <div class="client-profile-field">
+
+                        <label for="newPassword">
+                            Новий пароль
+                        </label>
+
+                        <div class="client-profile-password-input">
+
+                            <input type="password"
+                                   id="newPassword"
+                                   name="NewPassword"
+                                   autocomplete="new-password"
+                                   minlength="8"
+                                   required />
+
+                            <button type="button"
+                                    class="client-profile-eye-button"
+                                    data-target="newPassword"
+                                    aria-label="Показати пароль"
+                                    aria-pressed="false">
+
+                                <svg viewBox="0 0 24 24"
+                                     aria-hidden="true">
+
+                                    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
+
+                                    <circle cx="12"
+                                            cy="12"
+                                            r="3" />
+
+                                    <path class="eye-slash"
+                                          d="M3 3l18 18" />
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ПІДТВЕРДЖЕННЯ ПАРОЛЯ -->
+                    <div class="client-profile-field">
+
+                        <label for="confirmPassword">
+                            Повторіть пароль
+                        </label>
+
+                        <div class="client-profile-password-input">
+
+                            <input type="password"
+                                   id="confirmPassword"
+                                   name="ConfirmPassword"
+                                   autocomplete="new-password"
+                                   minlength="8"
+                                   required />
+
+                            <button type="button"
+                                    class="client-profile-eye-button"
+                                    data-target="confirmPassword"
+                                    aria-label="Показати пароль"
+                                    aria-pressed="false">
+
+                                <svg viewBox="0 0 24 24"
+                                     aria-hidden="true">
+
+                                    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
+
+                                    <circle cx="12"
+                                            cy="12"
+                                            r="3" />
+
+                                    <path class="eye-slash"
+                                          d="M3 3l18 18" />
+
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <p class="client-profile-password-hint">
+                    Новий пароль повинен містити щонайменше 8 символів.
+                </p>
+
+                <div class="client-profile-password-actions">
+
+                    <button type="submit"
+                            class="client-profile-primary-button">
+                        Змінити пароль
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+</div>
+
+@section Scripts {
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // ЕЛЕМЕНТИ ПРОФІЛЮ
+        const editButton =
+            document.getElementById("editProfileButton");
+
+        const editActions =
+            document.getElementById("profileEditActions");
+
+        const cancelEdit =
+            document.getElementById("cancelProfileEdit");
+
+        const profileForm =
+            document.getElementById("profileForm");
+
+        const profileInputs = [
+            document.getElementById("profileFullName"),
+            document.getElementById("profilePhone"),
+            document.getElementById("profileEmail")
+        ];
+
+        const originalValues =
+            profileInputs.map(input => input.value);
+
+        function setEditMode(enabled) {
+
+            profileInputs.forEach(input => {
+                input.readOnly = !enabled;
+            });
+
+            profileForm.classList.toggle(
+                "editing",
+                enabled
+            );
+
+            editActions.hidden = !enabled;
+            editButton.hidden = enabled;
+
+            if (enabled) {
+                profileInputs[0].focus();
+            }
+        }
+
+        editButton.addEventListener("click", function () {
+            setEditMode(true);
+        });
+
+        cancelEdit.addEventListener("click", function () {
+
+            profileInputs.forEach((input, index) => {
+                input.value = originalValues[index];
+            });
+
+            setEditMode(false);
+        });
+
+        // РОЗГОРТАННЯ ФОРМИ ПАРОЛЯ
+        const passwordToggle =
+            document.getElementById("togglePasswordButton");
+
+        const passwordToggleText =
+            document.getElementById("passwordToggleText");
+
+        const passwordForm =
+            document.getElementById("changePasswordForm");
+
+        function setPasswordMode(enabled) {
+
+            passwordForm.hidden = !enabled;
+
+            passwordToggleText.textContent =
+                enabled ? "Скасувати" : "Змінити пароль";
+
+            if (enabled) {
+
+                document.getElementById(
+                    "currentPassword"
+                ).focus();
+
+            } else {
+
+                passwordForm.reset();
+
+                document.querySelectorAll(
+                    ".client-profile-password-input input"
+                ).forEach(input => {
+                    input.type = "password";
+                });
+
+                document.querySelectorAll(
+                    ".client-profile-eye-button"
+                ).forEach(button => {
+                    button.setAttribute(
+                        "aria-pressed", "false"
+                    );
+                    button.setAttribute(
+                        "aria-label", "Показати пароль"
+                    );
+                });
+            }
+        }
+
+        passwordToggle.addEventListener("click", function () {
+            setPasswordMode(passwordForm.hidden);
+        });
+
+        // ПОКАЗАТИ / ПРИХОВАТИ ПАРОЛЬ
+        document.querySelectorAll(
+            ".client-profile-eye-button"
+        ).forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                const input = document.getElementById(
+                    button.dataset.target
+                );
+
+                const visible = input.type === "password";
+
+                input.type = visible ? "text" : "password";
+
+                button.setAttribute(
+                    "aria-pressed",
+                    visible ? "true" : "false"
+                );
+
+                button.setAttribute(
+                    "aria-label",
+                    visible ? "Приховати пароль" : "Показати пароль"
+                );
+
+            });
+
+        });
+
+        // ПЕРЕВІРКА ЗБІГУ ПАРОЛІВ
+        const newPassword =
+            document.getElementById("newPassword");
+
+        const confirmPassword =
+            document.getElementById("confirmPassword");
+
+        function validatePasswords() {
+
+            if (
+                confirmPassword.value &&
+                newPassword.value !== confirmPassword.value
+            ) {
+                confirmPassword.setCustomValidity(
+                    "Паролі не збігаються."
+                );
+            } else {
+                confirmPassword.setCustomValidity("");
+            }
+        }
+
+        newPassword.addEventListener(
+            "input", validatePasswords
+        );
+
+        confirmPassword.addEventListener(
+            "input", validatePasswords
+        );
+
+        // ЯКЩО СЕРВЕР ПОВЕРНУВ ПОМИЛКУ ПАРОЛЯ,
+        // АВТОМАТИЧНО ВІДКРИВАЄМО ФОРМУ
+        @if (!string.IsNullOrWhiteSpace(passwordError))
+        {
+            <text>setPasswordMode(true);</text>
+        }
+
+    });
+    </script>
+
+}
+

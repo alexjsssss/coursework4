@@ -1,0 +1,681 @@
+﻿
+/* Кольори */
+
+:root {
+    --page-bg: #EDF5FB;
+    --left-top: #D1ECFC;
+    --left-bottom: #8AC9EC;
+    --card-bg: #FFFFFF;
+    --card-border: #D4E1ED;
+    --text: #092B4A;
+    --secondary: #5D728B;
+    --blue: #1174BD;
+    --blue-hover: #095E9D;
+    --button-text: #FFFFFF;
+    --input-bg: #F4F8FC;
+    --input-border: #B7CDE2;
+    --welcome-text: #092B4A;
+    --logo-text: #092B4A;
+    --logo-bg: #0C2D4B;
+    --logo-drop: #81CEFF;
+    --logo-drop-detail: #0A3558;
+    --car-color: #0C2D4B;
+    --car-window-color: #D5EEFC;
+    --car-detail-color: #17486C;
+    --car-handle-color: #83B9DC;
+    --wheel-color: #245A84;
+    --wheel-center-color: #BFE7FF;
+    --bubble-fill: rgba(225, 246, 255, .55);
+    --bubble-stroke: #FFFFFF;
+    --foam-color: #FFFFFF;
+    --shadow-color: rgba(37, 107, 150, .28);
+    --error-color: #D84B55;
+    --success-bg: #E5F7EC;
+    --success-text: #206C40;
+}
+
+[data-theme="dark"] {
+    --page-bg: #0B1423;
+    --left-top: #10263D;
+    --left-bottom: #08192B;
+    --card-bg: #17253A;
+    --card-border: #2B405A;
+    --text: #D4E4F0;
+    --secondary: #A5BED1;
+    --blue: #35B5E8;
+    --blue-hover: #249CCF;
+    --button-text: #092B40;
+    --input-bg: #111D30;
+    --input-border: #3A506D;
+    --welcome-text: #D4E4F0;
+    --logo-text: #D4E4F0;
+    --logo-bg: #35B5E8;
+    --logo-drop: #0B2942;
+    --logo-drop-detail: #35B5E8;
+    --car-color: #91B7CE;
+    --car-window-color: #244B68;
+    --car-detail-color: #5D8CAA;
+    --car-handle-color: #244B68;
+    --wheel-color: #416F99;
+    --wheel-center-color: #BDD7E8;
+    --bubble-fill: rgba(55, 133, 172, .18);
+    --bubble-stroke: #5398BD;
+    --foam-color: #C5DDEB;
+    --shadow-color: rgba(0, 8, 18, .45);
+    --error-color: #F0A0A7;
+    --success-bg: #244B40;
+    --success-text: #B4E7CB;
+}
+
+/* Основні стилі */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+}
+
+button,
+input {
+    font: inherit;
+}
+
+.auth-page {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Ліва панель */
+
+.welcome-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 52%;
+    min-height: 100vh;
+    padding: 35px 5%;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: linear-gradient( 180deg, var(--left-top), var(--left-bottom) );
+}
+
+.logo {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    width: max-content;
+    max-width: 100%;
+    color: var(--logo-text);
+    text-decoration: none;
+    font-size: 27px;
+    font-weight: 750;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+    .logo:hover {
+        color: var(--logo-text);
+        text-decoration: none;
+    }
+
+.logo-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background: var(--logo-bg);
+}
+
+    .logo-icon svg {
+        display: block;
+        width: 28px;
+        height: 35px;
+    }
+
+        .logo-icon svg path:first-child {
+            fill: var(--logo-drop);
+        }
+
+        .logo-icon svg path:last-child {
+            stroke: var(--logo-drop-detail);
+        }
+
+.welcome-title {
+    position: relative;
+    z-index: 2;
+    margin: 48px 0 0;
+    color: var(--welcome-text);
+    font-size: clamp(41px, 4.3vw, 61px);
+    font-weight: 750;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+}
+
+/* Автомобіль */
+
+.car-illustration {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    z-index: 1;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 760px;
+}
+
+    .car-illustration svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+.car-body {
+    fill: var(--car-color);
+}
+
+.car-window {
+    fill: var(--car-window-color);
+}
+
+.car-detail {
+    fill: none;
+    stroke: var(--car-detail-color);
+    stroke-width: 3;
+}
+
+.car-handle {
+    fill: none;
+    stroke: var(--car-handle-color);
+    stroke-width: 5;
+    stroke-linecap: round;
+}
+
+.car-wheel {
+    fill: var(--wheel-color);
+}
+
+.car-wheel-center {
+    fill: var(--wheel-center-color);
+}
+
+.car-foam {
+    fill: var(--foam-color);
+}
+
+.bubble {
+    fill: var(--bubble-fill);
+    stroke: var(--bubble-stroke);
+    stroke-width: 2;
+}
+
+.car-shadow {
+    fill: var(--shadow-color);
+}
+
+/* Права панель */
+
+.login-panel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+    min-height: 100vh;
+    padding: 100px 6% 55px;
+    background: var(--page-bg);
+}
+
+/* Перемикач теми */
+
+.theme-switch {
+    position: absolute;
+    top: 22px;
+    right: 30px;
+    z-index: 5;
+}
+
+.theme-button {
+    display: flex;
+    align-items: center;
+    width: 98px;
+    height: 52px;
+    padding: 3px;
+    border: 1px solid var(--card-border);
+    border-radius: 30px;
+    background: var(--card-bg);
+    cursor: pointer;
+}
+
+.theme-option {
+    display: grid;
+    place-items: center;
+    width: 45px;
+    height: 44px;
+    border-radius: 50%;
+    color: var(--secondary);
+}
+
+    .theme-option svg {
+        width: 21px;
+        height: 21px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+[data-theme="light"] .theme-option[data-mode="light"],
+[data-theme="dark"] .theme-option[data-mode="dark"] {
+    background: var(--blue);
+    color: var(--button-text);
+}
+
+/* Форма авторизації */
+
+.auth-card {
+    width: 100%;
+    max-width: 510px;
+    padding: 48px 46px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 22px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .09);
+}
+
+    .auth-card h2 {
+        margin: 0 0 32px;
+        color: var(--text);
+        font-size: 34px;
+        font-weight: 750;
+        letter-spacing: -.8px;
+    }
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--text);
+        font-size: 17px;
+        font-weight: 600;
+    }
+
+.form-input {
+    display: block;
+    width: 100%;
+    height: 56px;
+    padding: 0 17px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 16px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+    .form-input::placeholder {
+        color: var(--secondary);
+        opacity: 1;
+    }
+
+    .form-input:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(53, 181, 232, .14);
+    }
+
+/* Поле пароля */
+
+.password-wrapper {
+    position: relative;
+}
+
+    .password-wrapper .form-input {
+        padding-right: 50px;
+    }
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--secondary);
+    cursor: pointer;
+}
+
+    .password-toggle:hover {
+        color: var(--blue);
+    }
+
+    .password-toggle svg {
+        width: 21px;
+        height: 21px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+.eye-slash {
+    display: block;
+}
+
+.password-toggle.visible .eye-slash {
+    display: none;
+}
+
+/* Приховування стандартної кнопки браузера */
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+input[type="password"] {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Додаткові поля */
+
+.remember-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 30px 0 32px;
+    color: var(--secondary);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+    .remember-label input {
+        width: 19px;
+        height: 19px;
+        margin: 0;
+        accent-color: var(--blue);
+        cursor: pointer;
+    }
+
+/* Кнопка входу */
+
+.login-button {
+    display: block;
+    width: 100%;
+    min-height: 58px;
+    padding: 12px;
+    background: var(--blue);
+    border: none;
+    border-radius: 11px;
+    color: var(--button-text);
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    .login-button:hover {
+        background: var(--blue-hover);
+    }
+
+/* Посилання */
+
+.register-link {
+    margin: 30px 0 0;
+    text-align: center;
+    color: var(--secondary);
+    font-size: 15px;
+}
+
+    .register-link a {
+        margin-left: 3px;
+        color: var(--blue);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+/* Реєстрація */
+
+.register-card {
+    padding: 35px 42px;
+}
+
+    .register-card h2 {
+        margin-bottom: 24px;
+    }
+
+    .register-card .form-group {
+        margin-bottom: 16px;
+    }
+
+    .register-card .form-input {
+        height: 51px;
+    }
+
+.name-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.register-card .login-button {
+    margin-top: 10px;
+}
+
+.register-card .register-link {
+    margin-top: 20px;
+}
+
+/* Повідомлення */
+
+.validation-summary,
+.field-error {
+    color: var(--error-color);
+    font-size: 13px;
+}
+
+    .validation-summary ul {
+        margin: 0 0 14px;
+        padding-left: 18px;
+    }
+
+.field-error {
+    display: block;
+    margin-top: 5px;
+}
+
+    .field-error:empty {
+        display: none;
+    }
+
+.success-message {
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 9px;
+    background: var(--success-bg);
+    color: var(--success-text);
+    font-size: 14px;
+}
+
+/* Плавна зміна теми */
+
+body,
+.welcome-panel,
+.login-panel,
+.auth-card,
+.logo-icon,
+.theme-button,
+.theme-option,
+.form-input,
+.login-button,
+.car-body,
+.car-window,
+.car-wheel,
+.car-wheel-center,
+.car-foam,
+.bubble,
+.car-shadow {
+    transition: background-color .25s ease, color .25s ease, border-color .25s ease, fill .25s ease, stroke .25s ease;
+}
+
+/* Адаптація */
+
+@media (max-width: 1100px) {
+    .welcome-panel {
+        width: 48%;
+        padding: 32px 5%;
+    }
+
+    .welcome-title {
+        font-size: 39px;
+    }
+
+    .car-illustration {
+        width: 108%;
+        bottom: 10%;
+    }
+
+    .login-panel {
+        padding-left: 4%;
+        padding-right: 4%;
+    }
+
+    .auth-card {
+        padding: 34px 30px;
+    }
+}
+
+@media (max-width: 760px) {
+    .auth-page {
+        flex-direction: column;
+    }
+
+    .welcome-panel {
+        width: 100%;
+        min-height: 180px;
+        padding: 25px;
+    }
+
+    .logo {
+        font-size: 24px;
+    }
+
+    .logo-icon {
+        width: 43px;
+        height: 43px;
+    }
+
+    .welcome-title {
+        margin-top: 22px;
+        font-size: 29px;
+    }
+
+    .car-illustration {
+        display: none;
+    }
+
+    .login-panel {
+        min-height: auto;
+        padding: 85px 20px 50px;
+    }
+
+    .theme-switch {
+        top: 17px;
+        right: 20px;
+    }
+
+    .auth-card {
+        max-width: 480px;
+        padding: 30px 24px;
+    }
+}
+
+@media (max-width: 420px) {
+    .welcome-panel {
+        padding: 22px;
+    }
+
+    .welcome-title {
+        font-size: 27px;
+    }
+
+    .auth-card {
+        padding: 26px 20px;
+    }
+
+        .auth-card h2 {
+            font-size: 28px;
+        }
+
+    .name-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .form-input {
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 761px) and (max-height: 720px) {
+    .welcome-title {
+        margin-top: 25px;
+        font-size: 40px;
+    }
+
+    .car-illustration {
+        width: 95%;
+        bottom: 5%;
+    }
+
+    .login-panel {
+        padding-top: 85px;
+        padding-bottom: 30px;
+    }
+
+    .auth-card {
+        padding: 28px;
+    }
+
+    .register-card {
+        padding-top: 22px;
+        padding-bottom: 22px;
+    }
+}
