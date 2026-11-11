@@ -1,0 +1,266 @@
+﻿
+@model IEnumerable<CarWashSystem.Models.Order>
+
+@{
+    ViewData["Title"] = "Історія замовлень";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+
+    var kyivTimeZone =
+        TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv");
+
+    var orders = Model
+        .OrderByDescending(o => o.CreatedAt)
+        .ToList();
+}
+
+<div class="history-page">
+
+    <!-- ЗАГОЛОВОК -->
+    <header class="history-heading">
+        <h1>Історія замовлень</h1>
+    </header>
+
+    <!-- ОСНОВНА КАРТКА -->
+    <section class="history-panel">
+
+        <!-- ФІЛЬТРИ -->
+        <div class="history-filters"
+             role="group"
+             aria-label="Фільтрація замовлень">
+
+            <button type="button"
+                    class="history-filter active"
+                    data-filter="all"
+                    aria-pressed="true">
+                Усі
+            </button>
+
+            <button type="button"
+                    class="history-filter"
+                    data-filter="completed"
+                    aria-pressed="false">
+                Завершені
+            </button>
+
+            <button type="button"
+                    class="history-filter"
+                    data-filter="cancelled"
+                    aria-pressed="false">
+                Скасовані
+            </button>
+
+        </div>
+
+        <!-- ТАБЛИЦЯ -->
+        <div class="history-table-scroll">
+
+            <table class="history-table">
+
+                <thead>
+                    <tr>
+                        <th>Замовлення</th>
+                        <th>Дата</th>
+                        <th>Бокс</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var order in orders)
+                    {
+                        var status =
+                            order.Status?.ToLowerInvariant() ?? "";
+
+                        var statusText = status switch
+                        {
+                            "pending" => "Очікує оплати",
+                            "paid" => "Оплачено",
+                            "in_progress" => "Миття триває",
+                            "completed" => "Завершено",
+                            "cancelled" => "Скасовано",
+                            _ => order.Status
+                        };
+
+                        var statusClass = status switch
+                        {
+                            "completed" => "completed",
+                            "cancelled" => "cancelled",
+                            "pending" => "pending",
+                            "paid" => "paid",
+                            "in_progress" => "paid",
+                            _ => "pending"
+                        };
+
+                        var originalBayName =
+                            order.WashingBay?.Name ?? "—";
+
+                        var bayName = originalBayName
+                            .Replace("Пост", "Бокс")
+                            .Replace("пост", "бокс");
+
+                        DateTime? kyivTime = null;
+
+                        if (order.CreatedAt.HasValue)
+                        {
+                            var utcTime = DateTime.SpecifyKind(
+                                order.CreatedAt.Value,
+                                DateTimeKind.Utc
+                            );
+
+                            kyivTime =
+                                TimeZoneInfo.ConvertTimeFromUtc(
+                                    utcTime,
+                                    kyivTimeZone
+                                );
+                        }
+
+                            <tr data-status="@status">
+
+                                <!-- НОМЕР -->
+                                <td class="history-order-number">
+                                    Ч-@order.Id
+                                </td>
+
+                                <!-- ДАТА -->
+                                <td>
+                                @(kyivTime?.ToString("dd.MM.yyyy HH:mm") ?? "—")
+                                </td>
+
+                                <!-- БОКС -->
+                                <td>
+                                @bayName
+                                </td>
+
+                                <!-- СУМА -->
+                                <td class="history-amount">
+                                @order.TotalAmount.ToString("N0") ₴
+                                </td>
+
+                                <!-- СТАТУС -->
+                                <td>
+
+                                    <span class="history-status @statusClass">
+
+                                        <span class="history-status-dot"
+                                              aria-hidden="true"></span>
+
+                                    @statusText
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- ПУСТИЙ СПИСОК -->
+        <div class="history-empty"
+             id="historyEmpty"
+             hidden>
+
+            <svg viewBox="0 0 24 24"
+                 width="32"
+                 height="32"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="1.8"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 aria-hidden="true">
+
+                <path d="M3 12a9 9 0 1 0 3-6.7" />
+                <path d="M3 4v5h5" />
+                <path d="M12 7v5l3 2" />
+
+            </svg>
+
+            <p>Замовлень за вибраним фільтром немає.</p>
+
+        </div>
+
+    </section>
+
+</div>
+
+@section Scripts {
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                const buttons =
+                    document.querySelectorAll(".history-filter");
+
+                const rows =
+                    document.querySelectorAll(".history-table tbody tr");
+
+                const empty =
+                    document.getElementById("historyEmpty");
+
+                const table =
+                    document.querySelector(".history-table-scroll");
+
+                function applyFilter(filter) {
+
+                    let visibleCount = 0;
+
+                    rows.forEach(function (row) {
+
+                        const status = row.dataset.status;
+
+                        const visible =
+                            filter === "all" ||
+                            status === filter;
+
+                        row.hidden = !visible;
+
+                        if (visible) {
+                            visibleCount++;
+                        }
+
+                    });
+
+                    buttons.forEach(function (button) {
+
+                        const active =
+                            button.dataset.filter === filter;
+
+                        button.classList.toggle("active", active);
+
+                        button.setAttribute(
+                            "aria-pressed",
+                            active ? "true" : "false"
+                        );
+
+                    });
+
+                    const hasOrders = visibleCount > 0;
+
+                    empty.hidden = hasOrders;
+                    table.hidden = !hasOrders;
+
+                }
+
+                buttons.forEach(function (button) {
+
+                    button.addEventListener("click", function () {
+
+                        applyFilter(button.dataset.filter);
+
+                    });
+
+                });
+
+                applyFilter("all");
+
+            });
+        </script>
+
+}

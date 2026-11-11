@@ -1,0 +1,365 @@
+﻿
+/* Оплата та підтвердження */
+
+.payment-layout {
+    min-height: 100vh;
+    margin: 0;
+    background: var(--app-bg);
+    color: var(--text);
+    font-family: "Inter", Arial, sans-serif;
+}
+
+/* Верхня панель */
+
+.payment-new-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 76px;
+    padding: 14px 30px;
+    background: var(--topbar-bg);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.payment-new-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    font-size: 23px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+    .payment-new-brand:hover {
+        color: var(--text);
+        text-decoration: none;
+    }
+
+/* Основний блок */
+
+.payment-new-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: calc(100vh - 76px);
+    padding: 45px 18px 70px;
+}
+
+.payment-new-card,
+.payment-confirmation-card {
+    width: 100%;
+    max-width: 570px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 32px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+}
+
+/* Заголовок */
+
+.payment-new-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 27px;
+}
+
+    .payment-new-heading h1 {
+        margin: 0 0 7px;
+        color: var(--text);
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .payment-new-heading p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+.payment-new-close {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    background: var(--accent-soft);
+    color: var(--text);
+    font-size: 26px;
+    cursor: pointer;
+}
+
+    .payment-new-close:hover {
+        background: var(--card-soft);
+    }
+
+/* Дані замовлення */
+
+.payment-new-details,
+.payment-new-services {
+    display: grid;
+    gap: 16px;
+}
+
+.payment-new-row,
+.confirmation-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 15px;
+    font-size: 14px;
+}
+
+    .payment-new-row span,
+    .confirmation-row span {
+        color: var(--muted);
+    }
+
+    .payment-new-row strong,
+    .confirmation-row strong {
+        color: var(--text);
+        font-weight: 600;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+.payment-new-subtitle {
+    margin: 27px 0 18px;
+    padding-top: 24px;
+    border-top: 1px solid var(--card-border);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* Підсумкова сума */
+
+.payment-new-total,
+.confirmation-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    color: var(--text);
+    font-weight: 700;
+}
+
+.payment-new-total {
+    margin-top: 25px;
+    padding: 22px 0;
+    border-top: 1px solid var(--card-border);
+}
+
+    .payment-new-total strong {
+        color: var(--text);
+        font-size: 28px;
+    }
+
+/* Кнопки */
+
+.payment-new-pay,
+.confirmation-home-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 11px;
+    background: var(--accent);
+    color: var(--accent-on);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .2s ease;
+}
+
+    .payment-new-pay:hover:not(:disabled),
+    .confirmation-home-button:hover {
+        background: var(--accent-hover);
+        color: var(--accent-on);
+        text-decoration: none;
+    }
+
+    .payment-new-pay:disabled {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+.payment-new-return {
+    margin-top: 20px;
+    text-align: center;
+}
+
+    .payment-new-return button {
+        padding: 7px;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+        .payment-new-return button:hover {
+            color: var(--accent);
+        }
+
+/* Підтвердження оплати */
+
+.confirmation-heading h1 {
+    margin: 0;
+    color: var(--text);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.confirmation-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 0 30px;
+    text-align: center;
+}
+
+.confirmation-check {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.confirmation-success h2 {
+    margin: 0 0 14px;
+    color: var(--text);
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.confirmation-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 13px;
+    border-radius: 8px;
+    background: var(--success-bg);
+    color: var(--success);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Деталі підтвердження */
+
+.confirmation-details {
+    padding: 22px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--card-soft);
+}
+
+.confirmation-row {
+    gap: 18px;
+    margin-bottom: 17px;
+    font-size: 13px;
+}
+
+    .confirmation-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .confirmation-row strong {
+        font-size: 13px;
+    }
+
+.confirmation-divider {
+    height: 1px;
+    margin: 21px 0;
+    background: var(--card-border);
+}
+
+.confirmation-details h3 {
+    margin: 0 0 20px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.confirmation-total {
+    gap: 16px;
+}
+
+    .confirmation-total span {
+        color: var(--text);
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .confirmation-total strong {
+        color: var(--text);
+        font-size: 27px;
+        font-weight: 700;
+    }
+
+.confirmation-home-button {
+    margin-top: 25px;
+}
+
+/* Мобільна версія */
+
+@media (max-width: 600px) {
+    .payment-new-topbar {
+        padding: 14px 18px;
+    }
+
+    .payment-new-main {
+        padding: 22px 12px;
+    }
+
+    .payment-new-card,
+    .payment-confirmation-card {
+        padding: 22px 18px;
+    }
+
+    .payment-new-heading h1 {
+        font-size: 24px;
+    }
+
+    .payment-new-row,
+    .confirmation-row,
+    .confirmation-row strong {
+        font-size: 12px;
+    }
+
+    .confirmation-heading h1 {
+        font-size: 21px;
+    }
+
+    .confirmation-details {
+        padding: 17px;
+    }
+
+    .confirmation-success h2 {
+        font-size: 17px;
+    }
+}

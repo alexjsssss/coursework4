@@ -1,0 +1,469 @@
+﻿
+@model CarWashSystem.ViewModels.ClientServicesViewModel
+
+@{
+    ViewData["Title"] = "Послуги";
+    Layout = "~/Views/Shared/_ClientLayout.cshtml";
+}
+
+<div class="services-page">
+
+    @Html.AntiForgeryToken()
+
+    <!-- ЗАГОЛОВОК -->
+    <div class="services-heading">
+
+        <h1>Послуги</h1>
+
+        <span class="services-available">
+            ● Доступно боксів: @Model.AvailableBays.Count
+        </span>
+
+    </div>
+
+    <div class="services-layout">
+
+        <!-- СПИСОК ПОСЛУГ -->
+        <section class="services-list">
+
+            @foreach (var service in Model.Services)
+            {
+                var icon = service.Name switch
+                {
+                    "Попереднє миття" => "spray-can",
+                    "Активна піна" => "cloud",
+                    "Миття водою" => "droplets",
+                    "Віск" => "sparkles",
+                    "Осмос" => "waves",
+                    _ => "droplets"
+                };
+
+                    <article class="service-item"
+                             data-id="@service.Id"
+                             data-name="@service.Name"
+                             data-price="@service.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                             data-duration="@service.DurationMinutes">
+
+                        <div class="service-icon">
+                            <i data-lucide="@icon"></i>
+                        </div>
+
+                        <div class="service-details">
+
+                            <h3>@service.Name</h3>
+
+                            <p>@service.Description</p>
+
+                            <div class="service-meta">
+
+                                <strong>
+                                @service.Price.ToString("N0") ₴
+                                </strong>
+
+                                <span>
+                                    <i data-lucide="clock-3"></i>
+                                @service.DurationMinutes хв
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <button type="button"
+                                class="service-add-button"
+                                data-service-id="@service.Id">
+
+                            <i data-lucide="plus"></i>
+                            <span>Додати</span>
+
+                        </button>
+
+                    </article>
+            }
+
+            @if (!Model.Services.Any())
+            {
+                    <div class="services-empty">
+                        Зараз немає доступних послуг.
+                    </div>
+            }
+
+        </section>
+
+        <!-- ВАШЕ ЗАМОВЛЕННЯ -->
+        <aside class="services-right">
+
+            <div class="order-panel">
+
+                <div class="order-panel-heading">
+
+                    <h2>Ваше замовлення</h2>
+
+                    <span id="selectedCount"
+                          class="order-count">
+                        0 послуг
+                    </span>
+
+                </div>
+
+                <!-- ОБРАНІ ПОСЛУГИ -->
+                <div id="selectedServices"
+                     class="selected-services">
+
+                    <p class="order-empty">
+                        Ви ще не обрали жодної послуги.
+                    </p>
+
+                </div>
+
+                <div class="order-divider"></div>
+
+                <!-- ТРИВАЛІСТЬ -->
+                <div class="order-duration-row">
+
+                    <span>Загальна тривалість</span>
+
+                    <strong id="totalDuration">
+                        0 хв
+                    </strong>
+
+                </div>
+
+                <!-- СУМА -->
+                <div class="order-total-row">
+
+                    <strong>До сплати</strong>
+
+                    <strong id="totalPrice">
+                        0 ₴
+                    </strong>
+
+                </div>
+
+                <!-- МИЙНИЙ БОКС -->
+                <div class="bay-selection">
+
+                    <label for="washingBay">
+                        Мийний бокс
+                    </label>
+
+                    <select id="washingBay"
+                            class="bay-select">
+
+                        @if (Model.AvailableBays.Any())
+                        {
+                            @foreach (var bay in Model.AvailableBays.OrderBy(b =>
+                               int.TryParse(
+                                   new string(b.Name.Where(char.IsDigit).ToArray()),
+                                   out var number
+                               ) ? number : int.MaxValue))
+                            {
+                                var number = new string(
+                                    bay.Name.Where(char.IsDigit).ToArray()
+                                );
+
+                                        <option value="@bay.Id">
+                                    @(string.IsNullOrEmpty(number)
+                                            ? bay.Name
+                                            : $"Бокс №{number}") · Вільний
+                                        </option>
+                            }
+                        }
+                        else
+                        {
+                                <option value="">
+                                    Немає вільних боксів
+                                </option>
+                        }
+
+                    </select>
+
+                    <p class="bay-help">
+
+                        @if (Model.AvailableBays.Any())
+                        {
+                            <text>
+                                    Доступно боксів: @Model.AvailableBays.Count
+                            </text>
+                        }
+                        else
+                        {
+                            <text>
+                                    Усі бокси зараз зайняті.
+                            </text>
+                        }
+
+                    </p>
+
+                </div>
+
+                <!-- ПІДТВЕРДЖЕННЯ -->
+                <button type="button"
+                        id="confirmOrder"
+                        class="confirm-order-button"
+                        disabled>
+
+                    <i data-lucide="arrow-right"></i>
+
+                    <span>
+                        Підтвердити замовлення
+                    </span>
+
+                </button>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+        <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+
+                const selected = new Map();
+
+                const cards =
+                    document.querySelectorAll(".service-item");
+
+                const selectedContainer =
+                    document.getElementById("selectedServices");
+
+                const countElement =
+                    document.getElementById("selectedCount");
+
+                const durationElement =
+                    document.getElementById("totalDuration");
+
+                const priceElement =
+                    document.getElementById("totalPrice");
+
+                const confirmButton =
+                    document.getElementById("confirmOrder");
+
+                const baySelect =
+                    document.getElementById("washingBay");
+
+                const currency = new Intl.NumberFormat("uk-UA", {
+                    maximumFractionDigits: 2
+                });
+
+                function formatPrice(value) {
+                    return currency.format(value) + " ₴";
+                }
+
+                function updateOrder() {
+
+                    selectedContainer.replaceChildren();
+
+                    let totalPrice = 0;
+                    let totalDuration = 0;
+
+                    if (selected.size === 0) {
+
+                        const empty = document.createElement("p");
+
+                        empty.className = "order-empty";
+
+                        empty.textContent =
+                            "Ви ще не обрали жодної послуги.";
+
+                        selectedContainer.appendChild(empty);
+
+                    } else {
+
+                        selected.forEach(service => {
+
+                            totalPrice += service.price;
+                            totalDuration += service.duration;
+
+                            const row = document.createElement("div");
+                            row.className = "selected-service-row";
+
+                            const details = document.createElement("div");
+
+                            const name = document.createElement("strong");
+                            name.textContent = service.name;
+
+                            const duration = document.createElement("small");
+                            duration.textContent = service.duration + " хв";
+
+                            details.append(name, duration);
+
+                            const price = document.createElement("span");
+                            price.textContent = formatPrice(service.price);
+
+                            const remove = document.createElement("button");
+
+                            remove.type = "button";
+                            remove.className = "remove-service";
+                            remove.textContent = "×";
+
+                            remove.setAttribute(
+                                "aria-label",
+                                "Прибрати " + service.name
+                            );
+
+                            remove.addEventListener("click", function () {
+                                toggleService(service.id);
+                            });
+
+                            row.append(details, price, remove);
+
+                            selectedContainer.appendChild(row);
+                        });
+                    }
+
+                    countElement.textContent =
+                        selected.size + " послуг";
+
+                    durationElement.textContent =
+                        totalDuration + " хв";
+
+                    priceElement.textContent =
+                        formatPrice(totalPrice);
+
+                    confirmButton.disabled =
+                        selected.size === 0 || !baySelect.value;
+                }
+
+                function toggleService(id) {
+
+                    const card = Array.from(cards).find(
+                        item => item.dataset.id === String(id)
+                    );
+
+                    if (!card) return;
+
+                    const button =
+                        card.querySelector(".service-add-button");
+
+                    if (selected.has(String(id))) {
+
+                        selected.delete(String(id));
+
+                        card.classList.remove("selected");
+                        button.classList.remove("added");
+
+                        button.innerHTML =
+                            '<i data-lucide="plus"></i><span>Додати</span>';
+
+                    } else {
+
+                        selected.set(String(id), {
+                            id: String(id),
+                            name: card.dataset.name,
+                            price: Number(card.dataset.price),
+                            duration: Number(card.dataset.duration)
+                        });
+
+                        card.classList.add("selected");
+                        button.classList.add("added");
+
+                        button.innerHTML =
+                            '<i data-lucide="check"></i><span>Додано</span>';
+                    }
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                    updateOrder();
+                }
+
+                document.querySelectorAll(
+                    ".service-add-button"
+                ).forEach(button => {
+
+                    button.addEventListener("click", function () {
+                        toggleService(this.dataset.serviceId);
+                    });
+
+                });
+
+                baySelect.addEventListener("change", updateOrder);
+
+                // СТВОРЕННЯ ЗАМОВЛЕННЯ
+                confirmButton.addEventListener("click", async function () {
+
+                    if (selected.size === 0 || !baySelect.value) {
+                        alert("Оберіть послуги та мийний бокс.");
+                        return;
+                    }
+
+                    const serviceIds =
+                        Array.from(selected.values())
+                            .map(service => Number(service.id));
+
+                    const orderData = {
+                        washingBayId: Number(baySelect.value),
+                        serviceIds: serviceIds
+                    };
+
+                    const token = document.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    ).value;
+
+                    confirmButton.disabled = true;
+
+                    try {
+
+                        const response = await fetch(
+                            '@Url.Action("CreateOrder", "Client")',
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "RequestVerificationToken": token
+                                },
+
+                                body: JSON.stringify(orderData)
+                            }
+                        );
+
+                        const result = await response.json();
+
+                        if (!response.ok) {
+
+                            alert(
+                                result.message ||
+                                "Не вдалося створити замовлення."
+                            );
+
+                            return;
+                        }
+
+                        if (result.redirectUrl) {
+                            window.location.href = result.redirectUrl;
+                        }
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                        alert("Помилка з'єднання із сервером.");
+
+                    } finally {
+
+                        confirmButton.disabled =
+                            selected.size === 0 || !baySelect.value;
+                    }
+
+                });
+
+                updateOrder();
+
+            });
+        </script>
+
+}

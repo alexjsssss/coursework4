@@ -1,0 +1,155 @@
+﻿
+@model CarWashSystem.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Оплата";
+    Layout = "~/Views/Shared/_PaymentLayout.cshtml";
+
+    var bayName = (Model.WashingBayName ?? "")
+        .Replace("Пост", "Бокс")
+        .Replace("пост", "бокс");
+}
+
+<section class="payment-new-card">
+
+    <!-- ЗАГОЛОВОК -->
+    <div class="payment-new-heading">
+
+        <div>
+            <h1>Оплата</h1>
+            <p>Замовлення Ч-@Model.OrderId</p>
+        </div>
+
+        <form asp-controller="Client"
+              asp-action="CancelOrder"
+              asp-route-id="@Model.OrderId"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <button type="submit"
+                    class="payment-new-close"
+                    aria-label="Скасувати замовлення"
+                    title="Скасувати замовлення">
+                ×
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- ІНФОРМАЦІЯ ПРО ЗАМОВЛЕННЯ -->
+    <div class="payment-new-details">
+
+        <div class="payment-new-row">
+            <span>Клієнт</span>
+            <strong>@Model.ClientName</strong>
+        </div>
+
+        <div class="payment-new-row">
+            <span>Мийний бокс</span>
+            <strong>@bayName</strong>
+        </div>
+
+        <div class="payment-new-row">
+            <span>Тривалість</span>
+            <strong>@Model.TotalDuration хв</strong>
+        </div>
+
+    </div>
+
+    <!-- ОБРАНІ ПОСЛУГИ -->
+    <h2 class="payment-new-subtitle">
+        Обрані послуги
+    </h2>
+
+    <div class="payment-new-services">
+
+        @foreach (var service in Model.Services)
+        {
+                <div class="payment-new-row">
+
+                    <span>@service.Name</span>
+
+                    <strong>
+                    @service.Price.ToString("N0") ₴
+                    </strong>
+
+                </div>
+        }
+
+    </div>
+
+    <!-- ЗАГАЛЬНА ВАРТІСТЬ -->
+    <div class="payment-new-total">
+
+        <span>До сплати</span>
+
+        <strong>
+            @Model.TotalAmount.ToString("N0") ₴
+        </strong>
+
+    </div>
+
+    <!-- КНОПКА ОПЛАТИ -->
+    <form asp-controller="Client"
+          asp-action="CompletePayment"
+          asp-route-id="@Model.OrderId"
+          method="post"
+          id="paymentForm">
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit"
+                class="payment-new-pay"
+                id="completePaymentButton">
+
+            Оплатити · @Model.TotalAmount.ToString("N0") ₴
+
+        </button>
+
+    </form>
+
+    <!-- СКАСУВАННЯ -->
+    <form asp-controller="Client"
+          asp-action="CancelOrder"
+          asp-route-id="@Model.OrderId"
+          method="post"
+          class="payment-new-return">
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit">
+            Скасувати та повернутися до послуг
+        </button>
+
+    </form>
+
+</section>
+
+@section Scripts {
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                const form =
+                    document.getElementById("paymentForm");
+
+                const button =
+                    document.getElementById("completePaymentButton");
+
+                if (form && button) {
+
+                    form.addEventListener("submit", function () {
+
+                        button.disabled = true;
+                        button.textContent = "Обробка оплати...";
+
+                    });
+
+                }
+
+            });
+        </script>
+
+}
