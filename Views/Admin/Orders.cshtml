@@ -1,0 +1,272 @@
+﻿
+@model IEnumerable<CarWashSystem.Models.Order>
+
+@{
+    ViewData["Title"] = "Замовлення";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var orders = Model.ToList();
+
+    var kyivZone = TimeZoneInfo
+        .FindSystemTimeZoneById("Europe/Kyiv");
+
+    var activeCount = orders.Count(o =>
+        o.Status == "pending" ||
+        o.Status == "paid" ||
+        o.Status == "in_progress");
+
+    var completedCount = orders.Count(o =>
+        o.Status == "completed");
+
+    var cancelledCount = orders.Count(o =>
+        o.Status == "cancelled");
+}
+
+<div class="admin-page admin-orders-page">
+
+    <header class="admin-page-heading">
+        <div>
+            <h1>Замовлення</h1>
+         
+        </div>
+    </header>
+
+    @if (TempData["AdminError"] != null)
+    {
+            <div class="admin-alert admin-alert-error"
+                 role="alert">
+            @TempData["AdminError"]
+            </div>
+    }
+
+    <section class="admin-panel">
+
+        <div class="admin-panel-heading">
+            <h2>Усі замовлення</h2>
+            <span class="admin-muted">
+                Знайдено: @orders.Count
+            </span>
+        </div>
+
+        <div class="admin-filter-bar"
+             role="group"
+             aria-label="Фільтрація замовлень">
+
+            <button type="button"
+                    class="admin-filter-button active"
+                    data-filter="all"
+                    aria-pressed="true">
+                Усі (@orders.Count)
+            </button>
+
+            <button type="button"
+                    class="admin-filter-button"
+                    data-filter="active"
+                    aria-pressed="false">
+                Активні (@activeCount)
+            </button>
+
+            <button type="button"
+                    class="admin-filter-button"
+                    data-filter="completed"
+                    aria-pressed="false">
+                Завершені (@completedCount)
+            </button>
+
+            <button type="button"
+                    class="admin-filter-button"
+                    data-filter="cancelled"
+                    aria-pressed="false">
+                Скасовані (@cancelledCount)
+            </button>
+
+        </div>
+
+        <div class="admin-table-scroll">
+
+            <table class="admin-table admin-orders-table">
+
+                <thead>
+                    <tr>
+                        <th>Замовлення</th>
+                        <th>Клієнт</th>
+                        <th>Дата</th>
+                        <th>Бокс</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                        <th>Дія</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var order in orders)
+                    {
+                        var date = order.CreatedAt.HasValue
+                            ? TimeZoneInfo.ConvertTimeFromUtc(
+                                DateTime.SpecifyKind(
+                                    order.CreatedAt.Value,
+                                    DateTimeKind.Utc),
+                                kyivZone)
+                            : (DateTime?)null;
+
+                        var status = order.Status?.ToLowerInvariant() ?? "";
+
+                        var statusText = status switch
+                        {
+                            "pending" => "Очікує оплати",
+                            "paid" => "Оплачено",
+                            "in_progress" => "Миття триває",
+                            "completed" => "Завершено",
+                            "cancelled" => "Скасовано",
+                            _ => order.Status
+                        };
+
+                        var canComplete =
+                            status == "paid" ||
+                            status == "in_progress";
+
+                            <tr data-status="@status">
+
+                                <td>
+                                    <strong>Ч-@order.Id</strong>
+                                </td>
+
+                                <td>
+                                @(order.User?.FullName ?? "—")
+                                </td>
+
+                                <td>
+                                @(date?.ToString("dd.MM.yyyy HH:mm") ?? "—")
+                                </td>
+
+                                <td>
+                                @(order.WashingBay?.Name ?? "—")
+                                </td>
+
+                                <td>
+                                    <strong>
+                                    @order.TotalAmount.ToString("N0") ₴
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span class="admin-order-status status-@status">
+                                        ● @statusText
+                                    </span>
+                                </td>
+
+                                <td>
+                                @if (canComplete)
+                                {
+                                            <form asp-controller="Admin"
+                                                  asp-action="CompleteOrder"
+                                                  asp-route-id="@order.Id"
+                                                  method="post"
+                                                  class="admin-inline-form">
+
+                                        @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="admin-small-primary"
+                                                        onclick="return confirm('Завершити замовлення Ч-@order.Id?');">
+                                                    Завершити
+                                                </button>
+
+                                            </form>
+                                }
+                                else
+                                {
+                                            <span class="admin-muted">—</span>
+                                }
+                                </td>
+
+                            </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-table-empty"
+             id="ordersEmpty"
+             hidden>
+            Замовлень із таким статусом немає.
+        </div>
+
+    </section>
+
+</div>
+
+@section Scripts {
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const buttons = document.querySelectorAll(
+            ".admin-filter-button"
+        );
+
+        const rows = document.querySelectorAll(
+            ".admin-orders-table tbody tr[data-status]"
+        );
+
+        const empty = document.getElementById("ordersEmpty");
+
+        function applyFilter(filter) {
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+
+                const status = row.dataset.status;
+                let visible = false;
+
+                if (filter === "all") {
+                    visible = true;
+                }
+                else if (filter === "active") {
+                    visible = [
+                        "pending",
+                        "paid",
+                        "in_progress"
+                    ].includes(status);
+                }
+                else {
+                    visible = status === filter;
+                }
+
+                row.hidden = !visible;
+
+                if (visible) {
+                    visibleCount++;
+                }
+            });
+
+            empty.hidden = visibleCount > 0;
+        }
+
+        buttons.forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                buttons.forEach(item => {
+                    item.classList.remove("active");
+                    item.setAttribute("aria-pressed", "false");
+                });
+
+                button.classList.add("active");
+                button.setAttribute("aria-pressed", "true");
+
+                applyFilter(button.dataset.filter);
+            });
+
+        });
+
+        applyFilter("all");
+
+    });
+    </script>
+
+}
+

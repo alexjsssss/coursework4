@@ -1,0 +1,72 @@
+﻿
+@model string
+
+@{
+    var icon = Model?.ToLowerInvariant() ?? "droplet";
+}
+
+<svg viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.8"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     aria-hidden="true">
+
+    @switch (icon)
+    {
+        case "prewash":
+                    <path d="M4 17h16" />
+                    <path d="M7 17l2-6h6l2 6" />
+                    <path d="M7 21v-4M17 21v-4" />
+                    <path d="M4 4l2 3M10 3l1 3M17 4l-1 3" />
+                    <path d="M3 11l3 2M21 11l-3 2" />
+            break;
+
+        case "water":
+                    <path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z" />
+                    <path d="M9 16a3 3 0 0 0 3 3" />
+            break;
+
+        case "foam":
+                    <circle cx="9" cy="15" r="4" />
+                    <circle cx="16" cy="14" r="5" />
+                    <circle cx="12" cy="8" r="4" />
+                    <circle cx="6" cy="7" r="2" />
+                    <path d="M5 20h14" />
+            break;
+
+        case "osmosis":
+                    <path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z" />
+                    <path d="M9 15l2 2 4-4" />
+            break;
+
+        case "wax":
+                    <path d="M4 15l2-5h12l2 5v4H4v-4Z" />
+                    <path d="M8 10l2-4h4l2 4" />
+                    <circle cx="8" cy="17" r="1" />
+                    <circle cx="16" cy="17" r="1" />
+                    <path d="M12 1v3M9 2l1 2M15 2l-1 2" />
+            break;
+
+        case "sparkles":
+                    <path d="M12 3l2.3 6.7L21 12l-6.7 2.3L12 21l-2.3-6.7L3 12l6.7-2.3L12 3Z" />
+                    <path d="M19 2v4M17 4h4" />
+            break;
+
+        case "brush":
+                    <path d="M14 4l6 6-9 9-6-6 9-9Z" />
+                    <path d="M12 6l6 6" />
+                    <path d="M5 13c-2 1-3 3-3 5 0 2 2 4 4 4 3 0 5-2 5-5" />
+            break;
+
+        case "shield":
+                    <path d="M12 2l8 4v6c0 5-3 8-8 10-5-2-8-5-8-10V6l8-4Z" />
+                    <path d="M9 12l2 2 4-4" />
+            break;
+
+        default:
+                    <path d="M12 2C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-13Z" />
+            break;
+    }
+</svg>

@@ -1,0 +1,523 @@
+﻿
+@model IEnumerable<CarWashSystem.Models.Service>
+
+@{
+    ViewData["Title"] = "Послуги та бокси";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var services = Model.ToList();
+
+    var bays = ViewBag.Bays as
+        List<CarWashSystem.Models.WashingBay>
+        ?? new();
+
+    var iconOptions = new[]
+    {
+        (Value: "prewash", Label: "Попереднє миття"),
+        (Value: "water", Label: "Вода"),
+        (Value: "foam", Label: "Піна"),
+        (Value: "osmosis", Label: "Осмос"),
+        (Value: "wax", Label: "Віск"),
+        (Value: "sparkles", Label: "Блиск"),
+        (Value: "brush", Label: "Щітка"),
+        (Value: "shield", Label: "Захист"),
+        (Value: "droplet", Label: "Крапля")
+    };
+}
+
+<div class="admin-page admin-services-page">
+
+    <header class="admin-page-heading">
+        <div>
+            <h1>Послуги та бокси</h1>
+        </div>
+    </header>
+
+    @if (TempData["AdminError"] != null)
+    {
+            <div class="admin-alert admin-alert-error" role="alert">
+            @TempData["AdminError"]
+            </div>
+    }
+
+    <!-- ПОСЛУГИ -->
+    <section class="admin-panel">
+
+        <div class="admin-panel-heading">
+            <div>
+                <h2>Послуги автомийки</h2>
+                <p class="admin-section-description">
+                    Активних: @services.Count(s => s.IsActive)
+                    із @services.Count
+                </p>
+            </div>
+
+            <button type="button"
+                    class="admin-primary-button"
+                    id="showAddService">
+                + Додати послугу
+            </button>
+        </div>
+
+        <!-- ДОДАВАННЯ -->
+        <div class="admin-editor-panel"
+             id="addServicePanel"
+             hidden>
+
+            <h3>Нова послуга</h3>
+
+            <form asp-controller="Admin"
+                  asp-action="AddService"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div class="admin-form-grid">
+
+                    <div class="admin-form-field">
+                        <label for="newName">Назва</label>
+                        <input id="newName"
+                               name="name"
+                               type="text"
+                               maxlength="100"
+                               required />
+                    </div>
+
+                    <div class="admin-form-field">
+                        <label for="newPrice">Ціна, ₴</label>
+                        <input id="newPrice"
+                               name="price"
+                               type="number"
+                               min="0"
+                               step="0.01"
+                               required />
+                    </div>
+
+                    <div class="admin-form-field">
+                        <label for="newDuration">
+                            Тривалість, хв
+                        </label>
+                        <input id="newDuration"
+                               name="durationMinutes"
+                               type="number"
+                               min="1"
+                               required />
+                    </div>
+
+                    <div class="admin-form-field">
+                        <label for="newIcon">Іконка</label>
+                        <select id="newIcon"
+                                name="icon"
+                                class="admin-icon-select"
+                                required>
+                            @foreach (var option in iconOptions)
+                            {
+                                    <option value="@option.Value">
+                                    @option.Label
+                                    </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="admin-form-field admin-form-full">
+                        <label for="newDescription">
+                            Опис послуги
+                        </label>
+                        <textarea id="newDescription"
+                                  name="description"
+                                  rows="3"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="admin-form-actions">
+                    <button type="submit"
+                            class="admin-primary-button">
+                        Додати послугу
+                    </button>
+
+                    <button type="button"
+                            class="admin-secondary-button"
+                            id="cancelAddService">
+                        Скасувати
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- СПИСОК ПОСЛУГ -->
+        <div class="admin-service-list">
+
+            @foreach (var service in services)
+            {
+                    <div class="admin-service-entry">
+
+                        <div class="admin-service-row">
+
+                            <div class="admin-service-main">
+                                <span class="admin-service-icon">
+                                @await Html.PartialAsync(
+                                             "_ServiceIcon",
+                                             service.Icon)
+                                </span>
+
+                                <div class="admin-service-details">
+                                    <strong>@service.Name</strong>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                   service.Description))
+                                {
+                                            <p>@service.Description</p>
+                                }
+
+                                    <span class="admin-service-duration">
+                                    @service.DurationMinutes хв
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="admin-service-actions">
+
+                                <strong class="admin-service-price">
+                                @service.Price.ToString("N0") ₴
+                                </strong>
+
+                                <span class="admin-service-state @(service.IsActive ? "enabled" : "disabled")">
+                                    ● @(service.IsActive ? "Активна" : "Вимкнена")
+                                </span>
+
+                                <button type="button"
+                                        class="admin-secondary-button admin-edit-service"
+                                        data-target="editor-@service.Id"
+                                        aria-expanded="false">
+                                    Редагувати
+                                </button>
+
+                                <form asp-controller="Admin"
+                                      asp-action="ToggleService"
+                                      asp-route-id="@service.Id"
+                                      method="post">
+                                @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="admin-secondary-button">
+                                    @(service.IsActive
+                                            ? "Вимкнути"
+                                            : "Увімкнути")
+                                    </button>
+                                </form>
+
+                                <form asp-controller="Admin"
+                                      asp-action="DeleteService"
+                                      asp-route-id="@service.Id"
+                                      method="post"
+                                      class="admin-delete-form">
+                                @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="admin-delete-button">
+                                        Видалити
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+
+                        <!-- РЕДАГУВАННЯ -->
+                        <div class="admin-editor-panel admin-service-editor"
+                             id="editor-@service.Id"
+                             hidden>
+
+                            <h3>Редагування послуги</h3>
+
+                            <form asp-controller="Admin"
+                                  asp-action="UpdateService"
+                                  asp-route-id="@service.Id"
+                                  method="post">
+
+                            @Html.AntiForgeryToken()
+
+                                <div class="admin-form-grid">
+
+                                    <div class="admin-form-field">
+                                        <label for="name-@service.Id">
+                                            Назва
+                                        </label>
+                                        <input id="name-@service.Id"
+                                               name="name"
+                                               type="text"
+                                               value="@service.Name"
+                                               maxlength="100"
+                                               required />
+                                    </div>
+
+                                    <div class="admin-form-field">
+                                        <label for="price-@service.Id">
+                                            Ціна, ₴
+                                        </label>
+                                        <input id="price-@service.Id"
+                                               name="price"
+                                               type="number"
+                                               min="0"
+                                               step="0.01"
+                                               value="@service.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                               required />
+                                    </div>
+
+                                    <div class="admin-form-field">
+                                        <label for="duration-@service.Id">
+                                            Тривалість, хв
+                                        </label>
+                                        <input id="duration-@service.Id"
+                                               name="durationMinutes"
+                                               type="number"
+                                               min="1"
+                                               value="@service.DurationMinutes"
+                                               required />
+                                    </div>
+
+                                    <div class="admin-form-field">
+                                        <label for="icon-@service.Id">
+                                            Іконка
+                                        </label>
+
+                                        <select id="icon-@service.Id"
+                                                name="icon"
+                                                class="admin-icon-select"
+                                                required>
+
+                                        @foreach (var option in iconOptions)
+                                        {
+                                            if (service.Icon == option.Value)
+                                            {
+                                                            <option value="@option.Value"
+                                                                    selected>
+                                                    @option.Label
+                                                            </option>
+                                            }
+                                            else
+                                            {
+                                                            <option value="@option.Value">
+                                                    @option.Label
+                                                            </option>
+                                            }
+                                        }
+                                        </select>
+                                    </div>
+
+                                    <div class="admin-form-field admin-form-full">
+                                        <label for="description-@service.Id">
+                                            Опис послуги
+                                        </label>
+                                        <textarea id="description-@service.Id"
+                                                  name="description"
+                                                  rows="3">@service.Description</textarea>
+                                    </div>
+
+                                </div>
+
+                                <div class="admin-form-actions">
+                                    <button type="submit"
+                                            class="admin-primary-button">
+                                        Зберегти зміни
+                                    </button>
+
+                                    <button type="button"
+                                            class="admin-secondary-button admin-close-editor"
+                                            data-target="editor-@service.Id">
+                                        Скасувати
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+            }
+
+            @if (!services.Any())
+            {
+                    <div class="admin-table-empty">
+                        Послуг поки немає.
+                    </div>
+            }
+        </div>
+    </section>
+
+    <!-- БОКСИ -->
+    <section class="admin-panel">
+
+        <div class="admin-panel-heading">
+            <div>
+                <h2>Мийні бокси</h2>
+                <p class="admin-section-description">
+                    Вільно:
+                    @bays.Count(b => b.Status == "available")
+                    із @bays.Count
+                </p>
+            </div>
+        </div>
+
+        <div class="admin-bays-grid admin-manage-bays-grid">
+
+            @foreach (var bay in bays)
+            {
+                var status = bay.Status?.ToLowerInvariant() ?? "";
+
+                var statusText = status switch
+                {
+                    "available" => "Вільний",
+                    "occupied" => "Зайнятий",
+                    "unavailable" => "Не працює",
+                    _ => "Невідомий стан"
+                };
+
+                var statusClass = status switch
+                {
+                    "available" => "admin-status-available",
+                    "occupied" => "admin-status-occupied",
+                    _ => "admin-status-unavailable"
+                };
+
+                    <div class="admin-bay-card">
+
+                        <span class="admin-bay-icon">
+                            <svg viewBox="0 0 48 48"
+                                 aria-hidden="true">
+                                <path class="admin-car-body"
+                                      d="M7 22L12 13C13 11 15 10 18 10H30C33 10 35 11 36 13L41 22V34H7V22Z" />
+                                <path class="admin-car-window"
+                                      d="M15 15H33L37 23H11L15 15Z" />
+                                <rect class="admin-car-window"
+                                      x="10" y="27"
+                                      width="7" height="3" rx="1.5" />
+                                <rect class="admin-car-window"
+                                      x="31" y="27"
+                                      width="7" height="3" rx="1.5" />
+                                <path class="admin-car-body"
+                                      d="M11 34H17V39H11Z M31 34H37V39H31Z" />
+                            </svg>
+                        </span>
+
+                        <strong>@bay.Name</strong>
+
+                        <span class="admin-bay-status @statusClass">
+                            ● @statusText
+                        </span>
+
+                    @if (status == "available" ||
+                        status == "unavailable")
+                    {
+                                <form asp-controller="Admin"
+                                      asp-action="ToggleBay"
+                                      asp-route-id="@bay.Id"
+                                      method="post"
+                                      class="admin-bay-form">
+
+                            @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="admin-secondary-button">
+                                @(status == "available"
+                                        ? "Вимкнути бокс"
+                                        : "Увімкнути бокс")
+                                    </button>
+                                </form>
+                    }
+                    else
+                    {
+                                <span class="admin-bay-note">
+                                    Бокс використовується
+                                </span>
+                    }
+                    </div>
+            }
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const addPanel = document.getElementById("addServicePanel");
+        const addButton = document.getElementById("showAddService");
+        const cancelAdd = document.getElementById("cancelAddService");
+
+        addButton.addEventListener("click", function () {
+            addPanel.hidden = false;
+            addButton.hidden = true;
+            document.getElementById("newName").focus();
+        });
+
+        cancelAdd.addEventListener("click", function () {
+            addPanel.querySelector("form").reset();
+            addPanel.hidden = true;
+            addButton.hidden = false;
+        });
+
+        document.querySelectorAll(".admin-edit-service")
+            .forEach(button => {
+
+                button.addEventListener("click", function () {
+                    const panel = document.getElementById(
+                        button.dataset.target
+                    );
+
+                    const opening = panel.hidden;
+
+                    document.querySelectorAll(".admin-service-editor")
+                        .forEach(editor => {
+                            editor.hidden = true;
+                        });
+
+                    document.querySelectorAll(".admin-edit-service")
+                        .forEach(item => {
+                            item.setAttribute("aria-expanded", "false");
+                        });
+
+                    panel.hidden = !opening;
+
+                    button.setAttribute(
+                        "aria-expanded",
+                        opening ? "true" : "false"
+                    );
+
+                    if (opening) {
+                        panel.querySelector('input[name="name"]').focus();
+                    }
+                });
+            });
+
+        document.querySelectorAll(".admin-close-editor")
+            .forEach(button => {
+
+                button.addEventListener("click", function () {
+                    const panel = document.getElementById(
+                        button.dataset.target
+                    );
+
+                    panel.querySelector("form").reset();
+                    panel.hidden = true;
+
+                    const editButton = document.querySelector(
+                        '.admin-edit-service[data-target="' +
+                        button.dataset.target + '"]'
+                    );
+
+                    if (editButton) {
+                        editButton.setAttribute("aria-expanded", "false");
+                    }
+                });
+            });
+
+        document.querySelectorAll(".admin-delete-form")
+            .forEach(form => {
+                form.addEventListener("submit", function (event) {
+                    if (!confirm("Видалити цю послугу?")) {
+                        event.preventDefault();
+                    }
+                });
+            });
+    });
+    </script>
+}
