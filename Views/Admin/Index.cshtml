@@ -1,0 +1,217 @@
+﻿
+@model IEnumerable<CarWashSystem.Models.Order>
+
+@{
+    ViewData["Title"] = "Головна";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var bays = ViewBag.Bays as
+        List<CarWashSystem.Models.WashingBay>
+        ?? new();
+
+    decimal revenue = (decimal)(ViewBag.TotalRevenue ?? 0m);
+    int todayOrders = (int)(ViewBag.TodayOrders ?? 0);
+    int totalOrders = (int)(ViewBag.TotalOrders ?? 0);
+    int available = bays.Count(b => b.Status == "available");
+
+    var zone = TimeZoneInfo
+        .FindSystemTimeZoneById("Europe/Kyiv");
+}
+
+<div class="admin-page">
+
+    <header class="admin-page-heading">
+        <div>
+            <h1>Головна</h1>
+           
+        </div>
+    </header>
+
+    <div class="admin-overview-layout">
+
+        <!-- ЛІВА ЧАСТИНА: БОКСИ -->
+        <section class="admin-panel admin-overview-bays">
+
+            <div class="admin-panel-heading">
+                <h2>Стан мийних боксів</h2>
+            </div>
+
+            <div class="admin-bays-grid">
+
+                @foreach (var bay in bays)
+                {
+                    var status = bay.Status?.ToLowerInvariant() ?? "";
+
+                    var statusText = status switch
+                    {
+                        "available" => "Вільний",
+                        "occupied" => "Зайнятий",
+                        _ => "Не працює"
+                    };
+
+                    var statusClass = status switch
+                    {
+                        "available" => "admin-status-available",
+                        "occupied" => "admin-status-occupied",
+                        _ => "admin-status-unavailable"
+                    };
+
+                        <div class="admin-bay-card">
+
+                            <span class="admin-bay-icon">
+                                <svg viewBox="0 0 48 48"
+                                     aria-hidden="true">
+                                    <path class="admin-car-body"
+                                          d="M7 22L12 13C13 11 15 10 18 10H30C33 10 35 11 36 13L41 22V34H7V22Z" />
+
+                                    <path class="admin-car-window"
+                                          d="M15 15H33L37 23H11L15 15Z" />
+
+                                    <rect class="admin-car-window"
+                                          x="10" y="27"
+                                          width="7" height="3" rx="1.5" />
+
+                                    <rect class="admin-car-window"
+                                          x="31" y="27"
+                                          width="7" height="3" rx="1.5" />
+
+                                    <path class="admin-car-body"
+                                          d="M11 34H17V39H11Z M31 34H37V39H31Z" />
+                                </svg>
+                            </span>
+
+                            <strong>@bay.Name</strong>
+
+                            <span class="admin-bay-status @statusClass">
+                                ● @statusText
+                            </span>
+
+                        </div>
+                }
+
+            </div>
+        </section>
+
+        <!-- ПРАВА ЧАСТИНА: СТАТИСТИКА -->
+        <section class="admin-overview-stats">
+
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">
+                    Загальний дохід
+                </span>
+                <strong class="admin-stat-number">
+                    @revenue.ToString("N0") ₴
+                </strong>
+            </div>
+
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">
+                    Замовлення сьогодні
+                </span>
+                <strong class="admin-stat-number">
+                    @todayOrders
+                </strong>
+            </div>
+
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">
+                    Усього замовлень
+                </span>
+                <strong class="admin-stat-number">
+                    @totalOrders
+                </strong>
+            </div>
+
+            <div class="admin-stat-card">
+                <span class="admin-stat-label">
+                    Вільні бокси
+                </span>
+                <strong class="admin-stat-number">
+                    @available / @bays.Count
+                </strong>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- ОСТАННІ ЗАМОВЛЕННЯ -->
+    <section class="admin-panel">
+
+        <div class="admin-panel-heading">
+            <h2>Останні замовлення</h2>
+
+            <a asp-controller="Admin"
+               asp-action="Orders"
+               class="admin-text-link">
+                Усі замовлення →
+            </a>
+        </div>
+
+        <div class="admin-table-scroll">
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th>Замовлення</th>
+                        <th>Клієнт</th>
+                        <th>Дата</th>
+                        <th>Бокс</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var order in Model)
+                    {
+                        var date = order.CreatedAt.HasValue
+                            ? TimeZoneInfo.ConvertTimeFromUtc(
+                                DateTime.SpecifyKind(
+                                    order.CreatedAt.Value,
+                                    DateTimeKind.Utc),
+                                zone)
+                            : (DateTime?)null;
+
+                        var status = order.Status ?? "";
+
+                        var statusText = status switch
+                        {
+                            "pending" => "Очікує оплати",
+                            "paid" => "Оплачено",
+                            "in_progress" => "Миття триває",
+                            "completed" => "Завершено",
+                            "cancelled" => "Скасовано",
+                            _ => status
+                        };
+
+                            <tr>
+                                <td><strong>Ч-@order.Id</strong></td>
+                                <td>@(order.User?.FullName ?? "—")</td>
+                                <td>@(date?.ToString("dd.MM.yyyy HH:mm") ?? "—")</td>
+                                <td>@(order.WashingBay?.Name ?? "—")</td>
+                                <td>@order.TotalAmount.ToString("N0") ₴</td>
+                                <td>
+                                    <span class="admin-order-status status-@status">
+                                        ● @statusText
+                                    </span>
+                                </td>
+                            </tr>
+                    }
+
+                    @if (!Model.Any())
+                    {
+                            <tr>
+                                <td colspan="6" class="admin-empty-table">
+                                    Замовлень поки немає.
+                                </td>
+                            </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
