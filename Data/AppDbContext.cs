@@ -20,7 +20,6 @@ namespace CarWashSystem.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Payment> Payments { get; set; }
 
-        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -110,6 +109,9 @@ namespace CarWashSystem.Data
 
             modelBuilder.Entity<Service>()
                 .Property(s => s.DurationMinutes).HasColumnName("duration_minutes");
+            modelBuilder.Entity<Service>()
+
+            .Property(s => s.Icon).HasColumnName("icon");
 
 
             // Orders
@@ -160,34 +162,7 @@ namespace CarWashSystem.Data
                 .Property(p => p.PaidAt).HasColumnName("paid_at");
 
 
-            modelBuilder.Entity<Notification>(entity =>
-            {
-                entity.ToTable("notifications");
-
-                entity.Property(n => n.Id)
-                    .HasColumnName("id");
-
-                entity.Property(n => n.UserId)
-                    .HasColumnName("user_id");
-
-                entity.Property(n => n.OrderId)
-                    .HasColumnName("order_id");
-
-                entity.Property(n => n.Title)
-                    .HasColumnName("title");
-
-                entity.Property(n => n.Message)
-                    .HasColumnName("message");
-
-                entity.Property(n => n.Type)
-                    .HasColumnName("type");
-
-                entity.Property(n => n.IsRead)
-                    .HasColumnName("is_read");
-
-                entity.Property(n => n.CreatedAt)
-                    .HasColumnName("created_at");
-            });
+          
         }
     }
 }
