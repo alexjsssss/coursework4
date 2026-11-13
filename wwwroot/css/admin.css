@@ -1,0 +1,924 @@
+﻿
+/* ==========================================
+   АДМІНІСТРАТИВНА ПАНЕЛЬ — ЧИСТО
+========================================== */
+
+.admin-layout {
+    font-family: "Inter", sans-serif;
+    color: var(--text);
+}
+
+.admin-page-content,
+.admin-page {
+    width: 100%;
+    min-width: 0;
+}
+
+.admin-page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+    .admin-page-heading h1 {
+        margin: 0 0 6px;
+        color: var(--text);
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .admin-page-heading p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+.admin-muted {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* ==========================================
+   СТАТИСТИКА
+========================================== */
+
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.admin-stat-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: 145px;
+    padding: 23px;
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+}
+
+.admin-stat-label {
+    margin-bottom: 17px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-stat-number {
+    margin-bottom: 10px;
+    color: var(--text);
+    font-size: clamp(22px, 2.2vw, 30px);
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.admin-stat-card small {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* ==========================================
+   ПАНЕЛІ
+========================================== */
+
+.admin-panel {
+    min-width: 0;
+    margin-bottom: 22px;
+    padding: 25px;
+    border: 1px solid var(--card-border);
+    border-radius: 15px;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+}
+
+.admin-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 23px;
+}
+
+    .admin-panel-heading h2 {
+        margin: 0;
+        color: var(--text);
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+.admin-section-description {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.admin-text-link {
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+    .admin-text-link:hover {
+        color: var(--accent-hover);
+        text-decoration: underline;
+    }
+
+/* ==========================================
+   БОКСИ
+========================================== */
+
+.admin-bays-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.admin-bay-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 11px;
+    min-width: 0;
+    padding: 19px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--card-soft);
+}
+
+.admin-bay-icon {
+    display: grid;
+    place-items: center;
+    width: 47px;
+    height: 47px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: var(--accent-soft);
+}
+
+    .admin-bay-icon svg {
+        display: block;
+        width: 35px;
+        height: 35px;
+        stroke: none;
+    }
+
+    .admin-bay-icon .admin-car-body {
+        fill: #0c2d4b;
+        stroke: none;
+    }
+
+    .admin-bay-icon .admin-car-window {
+        fill: #81ceff;
+        stroke: none;
+    }
+
+[data-theme="dark"] .admin-bay-icon .admin-car-body {
+    fill: #35b5e8;
+}
+
+[data-theme="dark"] .admin-bay-icon .admin-car-window {
+    fill: #10263d;
+}
+
+.admin-bay-card > strong {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.admin-bay-status {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-status-available {
+    color: #168a58;
+}
+
+.admin-status-occupied {
+    color: #d28a17;
+}
+
+.admin-status-unavailable {
+    color: #929baa;
+}
+
+[data-theme="dark"] .admin-status-available {
+    color: #6bdba7;
+}
+
+[data-theme="dark"] .admin-status-occupied {
+    color: #f1bb69;
+}
+
+[data-theme="dark"] .admin-status-unavailable {
+    color: #a8b6c8;
+}
+
+/* ==========================================
+   ГОЛОВНА: БОКСИ + 4 ПОКАЗНИКИ
+========================================== */
+
+.admin-overview-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.admin-overview-bays {
+    margin-bottom: 0;
+}
+
+    .admin-overview-bays .admin-bays-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .admin-overview-bays .admin-bay-card {
+        min-height: 145px;
+        padding: 16px;
+        justify-content: center;
+    }
+
+.admin-overview-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    min-width: 0;
+}
+
+    .admin-overview-stats .admin-stat-card {
+        min-height: 0;
+        padding: 20px;
+    }
+
+    .admin-overview-stats .admin-stat-label {
+        margin-bottom: 15px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .admin-overview-stats .admin-stat-number {
+        margin-bottom: 0;
+        font-size: clamp(23px, 2vw, 30px);
+    }
+
+/* ==========================================
+   ТАБЛИЦІ
+========================================== */
+
+.admin-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text);
+    font-size: 12px;
+}
+
+    .admin-table th {
+        padding: 16px 15px;
+        background: var(--card-soft);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .admin-table td {
+        padding: 17px 15px;
+        border-bottom: 1px solid var(--card-border);
+        vertical-align: middle;
+    }
+
+    .admin-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .admin-table td strong {
+        color: var(--text);
+        font-weight: 700;
+    }
+
+    .admin-table tbody tr:hover {
+        background: var(--card-soft);
+    }
+
+    .admin-table tr[hidden] {
+        display: none !important;
+    }
+
+.admin-empty-table,
+.admin-table-empty {
+    padding: 30px 15px !important;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+    .admin-table-empty[hidden] {
+        display: none !important;
+    }
+
+/* ==========================================
+   СТАТУСИ ЗАМОВЛЕНЬ
+========================================== */
+
+.admin-order-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+    .admin-order-status.status-pending {
+        background: rgba(225, 155, 45, 0.12);
+        color: #a76c11;
+    }
+
+    .admin-order-status.status-paid,
+    .admin-order-status.status-in_progress {
+        background: rgba(25, 125, 205, 0.11);
+        color: #1477b7;
+    }
+
+    .admin-order-status.status-completed {
+        background: rgba(35, 160, 105, 0.12);
+        color: #168a58;
+    }
+
+    .admin-order-status.status-cancelled {
+        background: rgba(140, 150, 165, 0.13);
+        color: #788595;
+    }
+
+[data-theme="dark"] .admin-order-status.status-pending {
+    color: #f0be70;
+}
+
+[data-theme="dark"] .admin-order-status.status-paid,
+[data-theme="dark"] .admin-order-status.status-in_progress {
+    color: #7bd0ff;
+}
+
+[data-theme="dark"] .admin-order-status.status-completed {
+    color: #75e2b0;
+}
+
+[data-theme="dark"] .admin-order-status.status-cancelled {
+    color: #b4bfce;
+}
+
+/* ==========================================
+   КНОПКИ
+========================================== */
+
+.admin-primary-button,
+.admin-small-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--accent);
+    color: var(--accent-on);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+    .admin-primary-button:hover,
+    .admin-small-primary:hover {
+        background: var(--accent-hover);
+        color: var(--accent-on);
+    }
+
+.admin-small-primary {
+    min-height: 34px;
+    padding: 8px 12px;
+    font-size: 11px;
+}
+
+.admin-secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 9px 14px;
+    border: 1px solid var(--card-border);
+    border-radius: 9px;
+    background: var(--card-bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+    .admin-secondary-button:hover {
+        background: var(--card-soft);
+    }
+
+.admin-inline-form {
+    display: inline;
+}
+
+/* ==========================================
+   ФІЛЬТРИ ЗАМОВЛЕНЬ
+========================================== */
+
+.admin-filter-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 20px;
+}
+
+.admin-filter-button {
+    min-height: 38px;
+    padding: 9px 15px;
+    border: 1px solid var(--card-border);
+    border-radius: 9px;
+    background: var(--card-bg);
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .admin-filter-button:hover {
+        background: var(--card-soft);
+        color: var(--text);
+    }
+
+    .admin-filter-button.active {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: var(--accent-on);
+    }
+
+/* ==========================================
+   СПИСОК ПОСЛУГ
+========================================== */
+
+.admin-service-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-service-entry {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--card-border);
+}
+
+    .admin-service-entry:first-child {
+        padding-top: 0;
+    }
+
+    .admin-service-entry:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+.admin-service-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.admin-service-main {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+    flex: 1;
+}
+
+.admin-service-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+    .admin-service-icon svg {
+        width: 25px;
+        height: 25px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1,8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+        .admin-service-icon svg * {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1,8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+.admin-service-details {
+    min-width: 0;
+}
+
+    .admin-service-details strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .admin-service-details p {
+        margin: 0 0 7px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+.admin-service-duration {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.admin-service-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+    .admin-service-actions form {
+        margin: 0;
+    }
+
+.admin-service-price {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-service-state {
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+    .admin-service-state.enabled {
+        background: rgba(35, 160, 105, 0.12);
+        color: #168a58;
+    }
+
+    .admin-service-state.disabled {
+        background: rgba(140, 150, 165, 0.13);
+        color: #788595;
+    }
+
+[data-theme="dark"] .admin-service-state.enabled {
+    color: #75e2b0;
+}
+
+[data-theme="dark"] .admin-service-state.disabled {
+    color: #b4bfce;
+}
+
+/* ==========================================
+   ФОРМИ
+========================================== */
+
+.admin-editor-panel {
+    margin: 18px 0 23px;
+    padding: 23px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--card-soft);
+}
+
+    .admin-editor-panel[hidden] {
+        display: none !important;
+    }
+
+    .admin-editor-panel h3 {
+        margin: 0 0 20px;
+        color: var(--text);
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.admin-form-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.admin-form-full {
+    grid-column: 1 / -1;
+}
+
+.admin-form-field label {
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-form-field input,
+.admin-form-field textarea,
+.admin-form-field select {
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 13px;
+    border: 1px solid var(--card-border);
+    border-radius: 9px;
+    outline: none;
+    background: var(--card-bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.admin-form-field textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.admin-form-field select {
+    cursor: pointer;
+}
+
+    .admin-form-field select option {
+        background: var(--card-bg);
+        color: var(--text);
+    }
+
+    .admin-form-field input:focus,
+    .admin-form-field textarea:focus,
+    .admin-form-field select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+.admin-form-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 11px;
+    margin-top: 23px;
+}
+
+/* ==========================================
+   ВИДАЛЕННЯ ПОСЛУГ
+========================================== */
+
+.admin-delete-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 9px 14px;
+    border: 1px solid rgba(210, 65, 65, 0.30);
+    border-radius: 9px;
+    background: rgba(210, 65, 65, 0.07);
+    color: #d24d4d;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+    .admin-delete-button:hover {
+        background: rgba(210, 65, 65, 0.15);
+    }
+
+[data-theme="dark"] .admin-delete-button {
+    color: #ff9696;
+    border-color: rgba(255, 150, 150, 0.28);
+}
+
+/* ==========================================
+   КЕРУВАННЯ БОКСАМИ
+========================================== */
+
+.admin-manage-bays-grid .admin-bay-card {
+    min-height: 195px;
+}
+
+.admin-bay-form {
+    width: 100%;
+    margin-top: auto;
+}
+
+    .admin-bay-form button {
+        width: 100%;
+    }
+
+.admin-bay-note {
+    margin-top: auto;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* ==========================================
+   ПОВІДОМЛЕННЯ
+========================================== */
+
+.admin-alert {
+    margin-bottom: 20px;
+    padding: 14px 17px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-alert-success {
+    border: 1px solid rgba(30, 160, 100, 0.25);
+    background: rgba(30, 160, 100, 0.10);
+    color: #168a58;
+}
+
+.admin-alert-error {
+    border: 1px solid rgba(210, 60, 60, 0.25);
+    background: rgba(210, 60, 60, 0.10);
+    color: #c44747;
+}
+
+[data-theme="dark"] .admin-alert-success {
+    color: #75e2b0;
+}
+
+[data-theme="dark"] .admin-alert-error {
+    color: #ff9696;
+}
+
+/* ==========================================
+   АДАПТИВНІСТЬ
+========================================== */
+
+@media (max-width: 1350px) {
+    .admin-overview-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-overview-stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-rows: auto;
+    }
+
+        .admin-overview-stats .admin-stat-card {
+            min-height: 120px;
+        }
+}
+
+@media (max-width: 1250px) {
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-service-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-service-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 900px) {
+    .admin-bays-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-overview-bays .admin-bays-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .admin-overview-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-panel {
+        padding: 20px;
+    }
+
+    .admin-table {
+        min-width: 740px;
+    }
+}
+
+@media (max-width: 650px) {
+    .admin-page-heading h1 {
+        font-size: 23px;
+    }
+
+    .admin-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .admin-overview-bays .admin-bays-grid,
+    .admin-overview-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+        .admin-overview-stats .admin-stat-card {
+            padding: 15px;
+        }
+
+    .admin-stat-card {
+        min-height: 120px;
+    }
+
+    .admin-panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-bays-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-form-full {
+        grid-column: auto;
+    }
+
+    .admin-service-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+        .admin-service-actions button,
+        .admin-service-actions form,
+        .admin-delete-button {
+            width: 100%;
+        }
+
+            .admin-service-actions form button {
+                width: 100%;
+            }
+
+    .admin-editor-panel {
+        padding: 17px;
+    }
+
+    .admin-form-actions {
+        flex-direction: column;
+    }
+
+        .admin-form-actions button {
+            width: 100%;
+        }
+}

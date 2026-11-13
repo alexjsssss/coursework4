@@ -20,10 +20,13 @@ namespace CarWashSystem.Models
         public decimal Price { get; set; }
 
         public int DurationMinutes { get; set; }
+        public string Icon { get; set; } = "droplet";
 
         public bool IsActive { get; set; } = true;
 
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+        
     }
 }
 
