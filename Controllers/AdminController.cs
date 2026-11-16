@@ -59,6 +59,7 @@ namespace CarWashSystem.Controllers
                 .Date;
 
             var start = TimeZoneInfo.ConvertTimeToUtc(today, zone);
+
             var end = TimeZoneInfo.ConvertTimeToUtc(
                 today.AddDays(1), zone);
 
@@ -104,6 +105,7 @@ namespace CarWashSystem.Controllers
             return View(orders);
         }
 
+        // ЗАВЕРШИТИ ЗАМОВЛЕННЯ
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteOrder(int id)
@@ -189,18 +191,21 @@ namespace CarWashSystem.Controllers
         public async Task<IActionResult> AddService(
             string name,
             string? description,
-            decimal price,
+            decimal? price,
             int durationMinutes,
             string icon)
         {
-            if (string.IsNullOrWhiteSpace(name) ||
+            if (!ModelState.IsValid ||
+                string.IsNullOrWhiteSpace(name) ||
                 name.Length > 100 ||
-                price < 0 ||
+                !price.HasValue ||
+                price.Value <= 0 ||
                 durationMinutes <= 0 ||
                 !AllowedIcons.Contains(icon))
             {
                 TempData["AdminError"] =
-                    "Перевірте дані нової послуги.";
+                    "Перевірте дані нової послуги. " +
+                    "Ціна повинна бути більшою за 0.";
 
                 return RedirectToAction(nameof(Services));
             }
@@ -209,13 +214,14 @@ namespace CarWashSystem.Controllers
             {
                 Name = name.Trim(),
                 Description = description?.Trim() ?? "",
-                Price = price,
+                Price = price.Value,
                 DurationMinutes = durationMinutes,
                 Icon = icon,
                 IsActive = true
             };
 
             _context.Services.Add(service);
+
             await _context.SaveChangesAsync();
 
             TempData["AdminSuccess"] =
@@ -231,7 +237,7 @@ namespace CarWashSystem.Controllers
             int id,
             string name,
             string? description,
-            decimal price,
+            decimal? price,
             int durationMinutes,
             string icon)
         {
@@ -241,21 +247,24 @@ namespace CarWashSystem.Controllers
             if (service == null)
                 return NotFound();
 
-            if (string.IsNullOrWhiteSpace(name) ||
+            if (!ModelState.IsValid ||
+                string.IsNullOrWhiteSpace(name) ||
                 name.Length > 100 ||
-                price < 0 ||
+                !price.HasValue ||
+                price.Value <= 0 ||
                 durationMinutes <= 0 ||
                 !AllowedIcons.Contains(icon))
             {
                 TempData["AdminError"] =
-                    "Перевірте введені дані.";
+                    "Не вдалося зберегти послугу. " +
+                    "Перевірте ціну та інші дані.";
 
                 return RedirectToAction(nameof(Services));
             }
 
             service.Name = name.Trim();
             service.Description = description?.Trim() ?? "";
-            service.Price = price;
+            service.Price = price.Value;
             service.DurationMinutes = durationMinutes;
             service.Icon = icon;
 
@@ -279,6 +288,7 @@ namespace CarWashSystem.Controllers
                 return NotFound();
 
             service.IsActive = !service.IsActive;
+
             await _context.SaveChangesAsync();
 
             TempData["AdminSuccess"] =
@@ -312,6 +322,7 @@ namespace CarWashSystem.Controllers
             }
 
             _context.Services.Remove(service);
+
             await _context.SaveChangesAsync();
 
             TempData["AdminSuccess"] =
@@ -361,9 +372,13 @@ namespace CarWashSystem.Controllers
                 }
 
                 if (bay.Status == "available")
+                {
                     bay.Status = "unavailable";
+                }
                 else if (bay.Status == "unavailable")
+                {
                     bay.Status = "available";
+                }
                 else
                 {
                     TempData["AdminError"] =
@@ -373,6 +388,7 @@ namespace CarWashSystem.Controllers
                 }
 
                 await _context.SaveChangesAsync();
+
                 await transaction.CommitAsync();
 
                 TempData["AdminSuccess"] =
@@ -390,4 +406,3 @@ namespace CarWashSystem.Controllers
         }
     }
 }
-

@@ -11,8 +11,5 @@ namespace CarWashSystem.ViewModels
 
         [Required(ErrorMessage = "Введіть пароль")]
         public string Password { get; set; } = string.Empty;
-
-        public bool RememberMe { get; set; }
     }
 }
-

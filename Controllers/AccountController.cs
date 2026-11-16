@@ -154,16 +154,16 @@ namespace CarWashSystem.Controllers
 
             var principal = new ClaimsPrincipal(identity);
 
-            var properties = new AuthenticationProperties
-            {
-                IsPersistent = model.RememberMe
-            };
 
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal,
-                properties
+                new AuthenticationProperties
+                {
+                    IsPersistent = false
+                }
             );
+
 
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))

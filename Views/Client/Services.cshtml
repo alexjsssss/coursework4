@@ -12,13 +12,7 @@
 
     <!-- ЗАГОЛОВОК -->
     <div class="services-heading">
-
         <h1>Послуги</h1>
-
-        <span class="services-available">
-            ● Доступно боксів: @Model.AvailableBays.Count
-        </span>
-
     </div>
 
     <div class="services-layout">
@@ -28,15 +22,7 @@
 
             @foreach (var service in Model.Services)
             {
-                var icon = service.Name switch
-                {
-                    "Попереднє миття" => "spray-can",
-                    "Активна піна" => "cloud",
-                    "Миття водою" => "droplets",
-                    "Віск" => "sparkles",
-                    "Осмос" => "waves",
-                    _ => "droplets"
-                };
+          
 
                     <article class="service-item"
                              data-id="@service.Id"
@@ -44,18 +30,31 @@
                              data-price="@service.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                              data-duration="@service.DurationMinutes">
 
-                        <div class="service-icon">
-                            <i data-lucide="@icon"></i>
-                        </div>
+                           <div class="service-icon">
+                        @{
+                            var clientIcon = (service.Icon ?? "").Trim().ToLowerInvariant() switch
+                            {
+                                "prewash" => "spray-can",
+                                "water" => "droplets",
+                                "foam" => "cloud",
+                                "osmosis" => "waves",
+                                "wax" => "sparkles",
+                                "sparkles" => "star",
+                                "brush" => "brush",
+                                "shield" => "shield-check",
+                                "droplet" => "droplet",
+                                _ => "droplet"
+                            };
+                        }
+
+        <i data-lucide="@clientIcon"></i>
+    </div>
 
                         <div class="service-details">
-
                             <h3>@service.Name</h3>
-
                             <p>@service.Description</p>
 
                             <div class="service-meta">
-
                                 <strong>
                                 @service.Price.ToString("N0") ₴
                                 </strong>
@@ -64,9 +63,7 @@
                                     <i data-lucide="clock-3"></i>
                                 @service.DurationMinutes хв
                                 </span>
-
                             </div>
-
                         </div>
 
                         <button type="button"
@@ -75,7 +72,6 @@
 
                             <i data-lucide="plus"></i>
                             <span>Додати</span>
-
                         </button>
 
                     </article>
@@ -96,14 +92,12 @@
             <div class="order-panel">
 
                 <div class="order-panel-heading">
-
                     <h2>Ваше замовлення</h2>
 
                     <span id="selectedCount"
                           class="order-count">
                         0 послуг
                     </span>
-
                 </div>
 
                 <!-- ОБРАНІ ПОСЛУГИ -->
@@ -113,31 +107,26 @@
                     <p class="order-empty">
                         Ви ще не обрали жодної послуги.
                     </p>
-
                 </div>
 
                 <div class="order-divider"></div>
 
                 <!-- ТРИВАЛІСТЬ -->
                 <div class="order-duration-row">
-
                     <span>Загальна тривалість</span>
 
                     <strong id="totalDuration">
                         0 хв
                     </strong>
-
                 </div>
 
                 <!-- СУМА -->
                 <div class="order-total-row">
-
                     <strong>До сплати</strong>
 
                     <strong id="totalPrice">
                         0 ₴
                     </strong>
-
                 </div>
 
                 <!-- МИЙНИЙ БОКС -->
@@ -179,7 +168,6 @@
                     </select>
 
                     <p class="bay-help">
-
                         @if (Model.AvailableBays.Any())
                         {
                             <text>
@@ -192,7 +180,6 @@
                                     Усі бокси зараз зайняті.
                             </text>
                         }
-
                     </p>
 
                 </div>
@@ -208,7 +195,6 @@
                     <span>
                         Підтвердити замовлення
                     </span>
-
                 </button>
 
             </div>
@@ -465,5 +451,4 @@
 
             });
         </script>
-
 }

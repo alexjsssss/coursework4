@@ -436,8 +436,13 @@
 </div>
 
 @section Scripts {
-    <script>
+        <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+
+        <script>
     document.addEventListener("DOMContentLoaded", function () {
+            if (window.lucide) {
+        lucide.createIcons();
+    }
 
         const addPanel = document.getElementById("addServicePanel");
         const addButton = document.getElementById("showAddService");
